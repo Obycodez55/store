@@ -7,7 +7,7 @@ const Auth = () => {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+//   const [error, setError] = useState<string>("");
 
   const [isLogin, setIsLogin] = useState<boolean>(true);
 
@@ -72,11 +72,11 @@ const handleSubmit = useCallback((e: HandleSubmitEvent) => {
 
           {isLogin ? (
             <p>
-              Don't have an account? <span className="text-red-600 cursor-pointer" onClick={(e)=>{setIsLogin(false)}}>Sign up</span>
+              Don&apos;t have an account? <span className="text-red-600 cursor-pointer" onClick={()=>{setIsLogin(false)}}>Sign up</span>
             </p>
           ) : (
             <p>
-              Already have an account? <span className="text-red-600 cursor-pointer" onClick={(e)=>{setIsLogin(true)}}>Login</span>
+              Already have an account? <span className="text-red-600 cursor-pointer" onClick={()=>{setIsLogin(true)}}>Login</span>
             </p>
           )}
 
