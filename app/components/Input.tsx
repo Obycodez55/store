@@ -31,7 +31,7 @@ const Input: React.FC<InputProps> = ({
                 pt-6 
                 pb-1 
                 w-full 
-                text-white 
+                text-gray-900 
                 text-md
                 border
                 appearance-none 
