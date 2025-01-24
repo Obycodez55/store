@@ -39,7 +39,7 @@ export default function Home() {
           <a href="/auth" className="bg-blue-950 text-white rounded-md px-4 py-2 font-semibold text-[18px] ">Login as a Merchant</a>
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-6 p-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4">
         {/* Market List */}
         {filteredMarkets.map((market) => (
           <MarketCard
