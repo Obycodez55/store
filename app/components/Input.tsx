@@ -2,7 +2,7 @@ import React from "react";
 
 interface InputProps{
     id: string;
-    onChange: any;
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     value: string,
     label: string,
     type?: string
@@ -33,10 +33,11 @@ const Input: React.FC<InputProps> = ({
                 w-full 
                 text-white 
                 text-md
-                bg-neutral-700 
+                border
                 appearance-none 
                 focus:outline-none 
                 focus:ring-0 
+                focus:shadow-sm
                 peer"
             
             placeholder=" "

@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useState } from "react";
 import Input from "../components/Input";
+import { FaUserLarge } from "react-icons/fa6";
 
 const Auth = () => {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -34,9 +35,12 @@ const handleSubmit = useCallback((e: HandleSubmitEvent) => {
         <img src="/images/market.jpg" alt="" />
       </div>
       <div className="flex justify-center items-center px-10">
-        <form action="" className="w-full space-y-8">
+        <form action="" className="md:w-[80%] p-3 space-y-8 border bg-white shadow-md rounded-md">
           <div className="flex justify-center items-center">
-            <h2 className="text-5xl font-bold">Login</h2>
+            <h2 className="md:text-5xl text-3xl font-bold flex gap-2 items-center "> <FaUserLarge className="text-blue-950 md:text-4xl text:2xl" />
+            {
+              isLogin ? "Login" : "Sign In"
+              }</h2>
           </div>
           <Input
             label="Phone Number"
@@ -72,17 +76,17 @@ const handleSubmit = useCallback((e: HandleSubmitEvent) => {
 
           {isLogin ? (
             <p>
-              Don&apos;t have an account? <span className="text-red-600 cursor-pointer" onClick={()=>{setIsLogin(false)}}>Sign up</span>
+              Don&apos;t have an account? <span className="text-blue-950 font-semibold cursor-pointer" onClick={()=>{setIsLogin(false)}}>Sign up</span>
             </p>
           ) : (
             <p>
-              Already have an account? <span className="text-red-600 cursor-pointer" onClick={()=>{setIsLogin(true)}}>Login</span>
+              Already have an account? <span className="text-blue-950 font-semibold cursor-pointer" onClick={()=>{setIsLogin(true)}}>Login</span>
             </p>
           )}
 
           <div className="flex justify-center items-center">
             <button
-              className="bg-neutral-500 hover:bg-neutral-700 text-white px-4 py-2 rounded-lg"
+              className="bg-blue-950 hover:bg-blue-900 font-semibold text-white px-6 py-2 rounded-lg"
              onClick={handleSubmit}
             >
               {loading ? "Loading..." : isLogin ? "Login" : "Register"}
