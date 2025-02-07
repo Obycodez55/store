@@ -2,20 +2,183 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+    @apply selection:bg-primary-200 selection:text-primary-900;
+  }
 
-@media (prefers-color-scheme: dark) {
+  /* System preference dark mode */
+  @media (prefers-color-scheme: dark) {
+    html.system-dark {
+      @apply selection:bg-primary-800 selection:text-primary-50;
+    }
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased transition-colors duration-200;
+  }
+
+  /* Dark mode styles */
+  .dark body {
+    @apply bg-dark-bg text-dark-text-primary;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4 {
+    @apply font-display font-semibold tracking-tight;
+  }
+
+  /* Focus States */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 dark:ring-primary-400 dark:ring-offset-dark-bg;
+  }
+
+  /* Improved accessibility for keyboard navigation */
+  .skip-to-content {
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 
+           focus:px-4 focus:py-2 focus:bg-white focus:text-primary-600 
+           focus:rounded-lg focus:shadow-lg focus:ring-2 focus:ring-primary-500;
+  }
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium
+           transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 
+           disabled:opacity-50 disabled:cursor-not-allowed
+           motion-safe:transition-all motion-safe:duration-200;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500
+           dark:bg-primary-500 dark:hover:bg-primary-600;
+  }
+
+  .btn-secondary {
+    @apply btn bg-white text-slate-700 border border-slate-200 
+           hover:bg-slate-50 focus:ring-slate-500
+           dark:bg-dark-surface dark:text-dark-text-primary dark:border-dark-border
+           dark:hover:bg-dark-border;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-slate-200 px-4 py-2.5 
+           text-slate-900 placeholder:text-slate-400
+           focus:border-primary-500 focus:ring-primary-500 sm:text-sm
+           dark:bg-dark-surface dark:border-dark-border dark:text-dark-text-primary
+           dark:placeholder:text-dark-text-secondary
+           dark:focus:border-primary-400 dark:focus:ring-primary-400;
+  }
+
+  .card {
+    @apply rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md
+           dark:bg-dark-surface dark:shadow-none dark:border dark:border-dark-border;
+  }
+
+  /* Accessibility-focused utilities */
+  .visually-hidden {
+    @apply sr-only;
+  }
+
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+           dark:focus:ring-primary-400 dark:focus:ring-offset-dark-bg;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .motion-safe\:transition-all,
+    .motion-safe\:transition,
+    .motion-safe\:transition-transform {
+      transition: none !important;
+    }
+  }
+
+  /* High contrast mode improvements */
+  @media (forced-colors: active) {
+    .high-contrast-outline {
+      @apply outline outline-2 outline-offset-2;
+    }
+  }
+
+  /* Custom scrollbar for better visibility */
+  .custom-scrollbar {
+    @apply scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100
+           dark:scrollbar-thumb-dark-border dark:scrollbar-track-dark-surface;
+  }
+
+  /* Improved touch targets for mobile */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

@@ -1,5 +1,5 @@
 "use client";
-import { Markets } from "@/app/data/markets";
+import { Markets } from "@/data/markets";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";

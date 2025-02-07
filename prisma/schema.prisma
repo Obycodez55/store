@@ -25,18 +25,18 @@ model User {
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?
-  access_token       String?
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -57,4 +57,62 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Market {
+  id          String         @id @default(cuid())
+  name        String
+  description String
+  image       String
+  location    String
+  prevDate    DateTime
+  nextDate    DateTime
+  vendors     Vendor[]
+  images      MarketImages[]
+}
+
+model MarketImages {
+  id       String @id @default(cuid())
+  url      String
+  market   Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  marketId String
+}
+
+model MarketSuggestions {
+  id          String @id @default(cuid())
+  name        String
+  description String
+}
+
+model Vendor {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  image       String?
+  marketId    String
+  market      Market    @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  products    Product[]
+}
+
+model Product {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  image       String?
+  price       Float
+  vendorId    String
+  tags        Tags[]
+  vendor      Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+}
+
+enum Tags {
+  FRUITS
+  VEGETABLES
+  DAIRY
+  MEAT
+  SEAFOOD
+  BAKERY
+  BEVERAGES
+  SNACKS
+  OTHER
 }

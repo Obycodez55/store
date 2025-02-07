@@ -1,70 +1,87 @@
 import React from "react";
 
-interface InputProps{
-    id: string;
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-    value: string,
-    label: string,
-    type?: string
+interface InputProps {
+  id: string;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string;
+  label: string;
+  type?: string;
+  error?: string;
+  disabled?: boolean;
 }
 
+const Input = React.forwardRef<HTMLInputElement, InputProps>(({
+  id,
+  onChange,
+  value,
+  label,
+  type = "text",
+  error,
+  disabled
+}, ref) => {
+  return (
+    <div className="space-y-1">
+      <div className="relative">
+        <input
+          ref={ref}
+          id={id}
+          type={type}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          className={`
+            w-full
+            rounded-lg
+            border
+            bg-white
+            px-4
+            py-3
+            text-sm
+            transition-all
+            duration-200
+            placeholder:text-transparent
+            focus:border-primary-500
+            focus:outline-none
+            focus:ring-2
+            focus:ring-primary-500/20
+            dark:bg-dark-surface
+            dark:border-dark-border
+            dark:focus:border-primary-400
+            dark:focus:ring-primary-400/20
+            ${error ? 'border-error-500' : 'border-slate-200'}
+            ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+          `}
+          placeholder={label}
+        />
+        <label
+          htmlFor={id}
+          className={`
+            absolute
+            left-4
+            -top-2.5
+            bg-white
+            px-1
+            text-xs
+            font-medium
+            transition-all
+            duration-200
+            dark:bg-dark-surface
+            ${error ? 'text-error-500' : 'text-slate-500'}
+            ${disabled ? 'opacity-50' : ''}
+          `}
+        >
+          {label}
+        </label>
+      </div>
+      {error && (
+        <p className="text-xs text-error-500 animate-fade-in">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+});
 
-const Input: React.FC<InputProps> = ({
-    id,
-    onChange,
-    value,
-    label,
-    type
-})=>{
-    return(
-        <div className="relative">
-            <input 
-            value={value}
-            type={type}
-            onChange={onChange}
-            id={id}
-            required
-            className="
-                block
-                rounded-md 
-                px-6 
-                pt-6 
-                pb-1 
-                w-full 
-                text-gray-900 
-                text-md
-                border
-                appearance-none 
-                focus:outline-none 
-                focus:ring-0 
-                focus:shadow-sm
-                peer"
-            
-            placeholder=" "
-            />
-            <label 
-            className="
-                absolute 
-                text-md 
-                text-zinc-400 
-                duration-150 
-                transaform
-                -translate-y-3
-                scale-75
-                top-4
-                z-10
-                origin-[0]
-                left-6
-                peer-placeholder-shown:scale-100
-                peer-placeholder-shown:translate-y-0
-                peer-focus:scale-75
-                peer-focus:-translate-y-3"
-            htmlFor={id}>
-                {label}
-            </label>
-        </div>
-        
-    )
-}
+Input.displayName = "Input";
 
 export default Input;

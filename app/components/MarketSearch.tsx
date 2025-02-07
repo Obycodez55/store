@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, Plus } from 'lucide-react';
-import { Markets } from '../data/markets';
+import React, { useState, useEffect, useRef } from "react";
+import { Search, Plus } from "lucide-react";
+import { Markets } from "../../data/markets";
 
-
-export type Market = typeof Markets[0]; 
+export type Market = (typeof Markets)[0];
 
 interface MarketSearchProps {
   markets: Market[];
@@ -16,16 +15,17 @@ export const MarketSearch: React.FC<MarketSearchProps> = ({
   onMarketSelect,
   onSuggestMarket
 }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([]);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   // Filter markets based on search term
   useEffect(() => {
-    const filtered = markets.filter(market =>
-      market.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      market.location.toLowerCase().includes(searchTerm.toLowerCase())
+    const filtered = markets.filter(
+      (market) =>
+        market.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        market.location.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredMarkets(filtered);
   }, [searchTerm, markets]);
@@ -33,13 +33,16 @@ export const MarketSearch: React.FC<MarketSearchProps> = ({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,13 +52,13 @@ export const MarketSearch: React.FC<MarketSearchProps> = ({
 
   const handleMarketClick = (market: Market) => {
     onMarketSelect(market);
-    setSearchTerm('');
+    setSearchTerm("");
     setIsOpen(false);
   };
 
   const handleSuggestMarket = () => {
     onSuggestMarket();
-    setSearchTerm('');
+    setSearchTerm("");
     setIsOpen(false);
   };
 

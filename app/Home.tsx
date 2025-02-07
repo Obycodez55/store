@@ -5,7 +5,7 @@ import { Listbox, Transition } from "@headlessui/react";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, Menu, X } from "lucide-react";
 import MarketCard from "./components/MarketCard";
-import { Markets } from "./data/markets";
+import { Markets } from "../data/markets";
 import { signOut } from "next-auth/react";
 import { Market, MarketSearch } from "./components/MarketSearch";
 import { useRouter } from "next/navigation";
@@ -25,7 +25,7 @@ const sortOptions: FilterOption[] = [
   { id: "1", name: "Newest First", value: "newest" },
   { id: "2", name: "Oldest First", value: "oldest" },
   { id: "3", name: "A-Z", value: "alphabetical" },
-  { id: "4", name: "Location", value: "location" },
+  { id: "4", name: "Location", value: "location" }
 ];
 
 // Skeleton Component for loading state
@@ -52,7 +52,7 @@ export function Home() {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
       return Markets;
-    },
+    }
   });
 
   // Debounced sort function
