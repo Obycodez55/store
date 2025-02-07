@@ -15,7 +15,7 @@ export const subscribe = (eventData: CalendarEvent) => {
   const params = new URLSearchParams({
     action: 'TEMPLATE',
     text: summary,
-    dates: `${prevDate.replace(/-/g, '')}/${prevDate.replace(/-/g, '')}`,
+    dates: `${nextDate.replace(/-/g, '')}/${nextDate.replace(/-/g, '')}`,
     details: description || '',
     recur: `RRULE:FREQ=DAILY;INTERVAL=${moment(nextDate).diff(moment(prevDate), 'days')}`
   });

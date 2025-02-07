@@ -1,4 +1,4 @@
-const moment = require('moment');
+import moment from "moment";
 
 export function getMarketDays(prevDate: string, nextDate: string) {
 
@@ -13,7 +13,7 @@ export function getMarketDays(prevDate: string, nextDate: string) {
     const today = moment().startOf('day');
 
     // Find the last market day before today
-    let lastMarketDay = prev.clone();
+    const lastMarketDay = prev.clone();
     while (lastMarketDay.isBefore(today)) {
         lastMarketDay.add(interval, 'days');
     }

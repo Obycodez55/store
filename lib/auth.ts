@@ -1,10 +1,11 @@
-import NextAuth, { SessionStrategy } from 'next-auth'
+import { SessionStrategy } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import prisma from './prisma'
 import bcrypt from 'bcryptjs'
+import { AuthOptions } from 'next-auth'
 
-export const authOptions = {
+export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
@@ -29,7 +30,7 @@ export const authOptions = {
 
         // Check password
         const isPasswordValid = await bcrypt.compare(
-          credentials.password, 
+          credentials.password,
           user.password
         )
 
@@ -56,7 +57,19 @@ export const authOptions = {
   },
   pages: {
     signIn: '/auth/signin'
+  },
+  debug: true,
+  logger: {
+    error(code, metadata) {
+      console.error(code, metadata)
+    },
+    warn(code) {
+      console.warn(code)
+    },
+    debug(code, metadata) {
+      console.debug(code, metadata)
+    }
   }
 }
 
-export default NextAuth(authOptions)
+export default authOptions

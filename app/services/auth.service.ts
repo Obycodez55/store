@@ -16,7 +16,7 @@ export async function login({ email, password }: { email: string; password: stri
 
 export async function register({ email, password }: { email: string; password: string }) {
     try {
-        const response = await axios.post("/api/register", {
+        const response = await axios.post("/api/auth/register", {
             email,
             password
         });

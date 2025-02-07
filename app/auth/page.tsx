@@ -2,7 +2,6 @@
 import { useCallback, useState, useEffect } from "react";
 import Input from "../components/Input";
 import { FaUserLarge } from "react-icons/fa6";
-import { LoginButton } from "../components/LoginButton";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { login, register } from "../services/auth.service";
@@ -18,12 +17,21 @@ const Auth = () => {
     }
   }, [status, router]);
 
+  
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   const [isLogin, setIsLogin] = useState<boolean>(true);
+
+  const resetButton = () =>{
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setLoading(false);
+  }
+
 
   interface HandleSubmitEvent extends React.MouseEvent<HTMLButtonElement> {
     preventDefault: () => void;
@@ -40,12 +48,20 @@ const Auth = () => {
             description: "You are now logged in"
           });
           router.push("/");
-        } catch (error) {
+        } catch (_error: any) {
+          console.log(_error);
           toast.error("Login Failed", {
             description: "Invalid email or password"
           });
         }
       } else {
+        if(password !== confirmPassword) {
+          toast.error("Registration Failed", {
+            description: "Passwords do not match"
+          });
+          setLoading(false);
+          return;
+        }
         try {
           await register({ email, password });
           toast.success("Registration Successful", {
@@ -57,8 +73,9 @@ const Auth = () => {
           });
         }
       }
+      resetButton();
     },
-    [email, password, confirmPassword, isLogin]
+    [email, password, confirmPassword, isLogin, router]
   );
   return (
     <div className="grid md:grid-cols-2 shadow-xl p-4 h-screen text-gray-900">
@@ -143,7 +160,6 @@ const Auth = () => {
               {loading ? "Loading..." : isLogin ? "Login" : "Register"}
             </button>
           </div>
-          <LoginButton />
         </form>
       </div>
     </div>
