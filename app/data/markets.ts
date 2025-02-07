@@ -7,7 +7,8 @@ export const Markets = [
         image: '/images/market_3.jpg',
         location: '123 Main St, Cityville',
         images: ["/images/market_2.jpg", "/images/market_3.jpg", "/images/market_4.jpg", "/images/market_5.jpg"],
-        duration: 5,
+        prevDate: '2021-10-01',
+        nextDate: '2021-10-6-06',
     },
     {
         id: '2',
@@ -16,7 +17,8 @@ export const Markets = [
         image: '/images/market_2.jpg',
         location: '456 Elm St, Uptown',
         images: ["/images/market_2.jpg", "/images/market_3.jpg", "/images/market_4.jpg", "/images/market_5.jpg"],
-
+        prevDate: '2021-09-01',
+        nextDate: '2021-09-12',
     },
     {
         id: '3',
@@ -25,7 +27,8 @@ export const Markets = [
         image: '/images/market_4.jpg',
         location: '789 Oak St, Suburbia',
         images: ["/images/market_2.jpg", "/images/market_3.jpg", "/images/market_4.jpg", "/images/market_5.jpg"],
-
+        prevDate: '2021-08-01',
+        nextDate: '2021-08-08',
     }
     ,
     {
@@ -35,7 +38,8 @@ export const Markets = [
         image: '/images/market.jpg',
         location: '101 River Rd, Riverside',
         images: ["/images/market_2.jpg", "/images/market_3.jpg", "/images/market_4.jpg", "/images/market_5.jpg"],
-
+        prevDate: '2021-07-01',
+        nextDate: '2021-07-08',
     },
     {
         id: '5',
@@ -44,7 +48,8 @@ export const Markets = [
         image: '/images/market_5.jpg',
         location: '202 Mountain Dr, Highland',
         images: ["/images/market_2.jpg", "/images/market_3.jpg", "/images/market_4.jpg", "/images/market_5.jpg"],
-
+        prevDate: '2021-06-01',
+        nextDate: '2021-06-11',
     },
     {
         id: '6',
@@ -53,7 +58,8 @@ export const Markets = [
         image: '/images/market.jpg',
         location: '303 Beach Ave, Seaside',
         images: ["/images/market_2.jpg", "/images/market_3.jpg", "/images/market_4.jpg", "/images/market_5.jpg"],
-
+        prevDate: '2021-05-01',
+        nextDate: '2021-05-10',
     },
     {
         id: '7',
@@ -62,7 +68,8 @@ export const Markets = [
         image: '/images/market_3.jpg',
         location: '404 Village St, Countryside',
         images: ["/images/market_2.jpg", "/images/market_3.jpg", "/images/market_4.jpg", "/images/market_5.jpg"],
-
+        prevDate: '2021-04-01',
+        nextDate: '2021-04-15',
     },
     {
         id: '8',
@@ -71,7 +78,8 @@ export const Markets = [
         image: '/images/market_5.jpg',
         location: '505 Park Ln, Metropolis',
         images: ["/images/market_2.jpg", "/images/market_3.jpg", "/images/market_4.jpg", "/images/market_5.jpg"],
-
+        prevDate: '2021-03-01',
+        nextDate: '2021-03-15',
     },
     {
         id: '9',
@@ -80,7 +88,8 @@ export const Markets = [
         image: '/images/market_4.jpg',
         location: '606 Harbor Rd, Portside',
         images: ["/images/market_2.jpg", "/images/market_3.jpg", "/images/market_4.jpg", "/images/market_5.jpg"],
-
+        prevDate: '2021-02-01',
+        nextDate: '2021-02-14',
     },
     {
         id: '10',
@@ -89,6 +98,7 @@ export const Markets = [
         image: '/images/market_2.jpg',
         location: '707 Historic Blvd, Oldtown',
         images: ["/images/market_2.jpg", "/images/market_3.jpg", "/images/market_4.jpg", "/images/market_5.jpg"],
-
+        prevDate: '2021-01-01',
+        nextDate: '2021-01-15',
     }
 ]

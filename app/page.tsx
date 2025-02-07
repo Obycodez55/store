@@ -2,8 +2,10 @@
 import { useCallback, useState } from "react";
 import MarketCard from "./components/MarketCard";
 import { Markets } from "./data/markets";
+import useAuth from "./hooks/useAuth";
 
 export default function Home() {
+  useAuth();
   const [searchItem, setSearchItem] = useState("");
   const [filteredMarkets, setFilteredMarkets] = useState(Markets);
 
