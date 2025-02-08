@@ -14,6 +14,7 @@ import { Market } from "@/types/market";
 import moment from "moment";
 import { PageTransition } from "./components/PageTransition";
 import { UserMenu } from "./components/UserMenu";
+import { LoadingGrid } from "./components/LoadingGrid";
 
 // Animation variants
 const containerVariants = {
@@ -60,16 +61,6 @@ const sortOptions: FilterOption[] = [
   { id: "3", name: "A-Z", value: "alphabetical" },
   { id: "4", name: "Location", value: "location" }
 ];
-
-// Skeleton Component for loading state
-const MarketCardSkeleton = () => (
-  <div className="bg-card rounded-lg shadow-md p-4 h-[300px] animate-pulse">
-    <div className="w-full h-40 bg-gray-200 rounded-lg mb-4" />
-    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-    <div className="h-4 bg-gray-200 rounded w-1/2 mb-4" />
-    <div className="h-4 bg-gray-200 rounded w-full" />
-  </div>
-);
 
 export function Home() {
   const { data: markets, isLoading } = useMarkets();
@@ -293,33 +284,25 @@ export function Home() {
             animate="show"
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr"
           >
-            {isLoading
-              ? Array(6)
-                  .fill(0)
-                  .map((_, index) => (
-                    <motion.div
-                      key={index}
-                      variants={itemVariants}
-                      className="animate-pulse"
-                    >
-                      <MarketCardSkeleton />
-                    </motion.div>
-                  ))
-              : filteredMarkets.map((market) => (
-                  <motion.div
-                    key={market.id}
-                    variants={itemVariants}
-                    className="h-full"
-                  >
-                    <MarketCard
-                      id={market.id}
-                      name={market.name}
-                      description={market.description}
-                      image={market.image}
-                      location={market.location}
-                    />
-                  </motion.div>
-                ))}
+            {isLoading ? (
+              <LoadingGrid />
+            ) : (
+              filteredMarkets.map((market) => (
+                <motion.div
+                  key={market.id}
+                  variants={itemVariants}
+                  className="h-full"
+                >
+                  <MarketCard
+                    id={market.id}
+                    name={market.name}
+                    description={market.description}
+                    image={market.image}
+                    location={market.location}
+                  />
+                </motion.div>
+              ))
+            )}
           </motion.div>
         </main>
       </div>

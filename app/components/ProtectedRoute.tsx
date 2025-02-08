@@ -1,28 +1,29 @@
 // components/ProtectedRoute.tsx
-"use client"
+"use client";
 
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { LoadingScreen } from "./LoadingScreen";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { status, data } = useSession();
-  console.log(status, data)
-  const router = useRouter()
+  console.log(status, data);
+  const router = useRouter();
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.replace('/auth')
+    if (status === "unauthenticated") {
+      router.replace("/auth");
     }
-  }, [status, router])
+  }, [status, router]);
 
-  if (status === 'loading') {
-    return <div>Loading...</div>
+  if (status === "loading") {
+    return <LoadingScreen />;
   }
 
-  if (status === 'authenticated') {
-    return <>{children}</>
+  if (status === "authenticated") {
+    return <>{children}</>;
   }
 
-  return null
+  return null;
 }

@@ -31,15 +31,15 @@ const ProductCard = (props: Props) => {
     <>
       <motion.div
         whileHover={{ y: -5 }}
-        className="h-full group cursor-pointer"
+        className="group cursor-pointer"
         onClick={() => setIsModalOpen(true)}
       >
         <div className="flex flex-col h-full bg-card rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
-          <div className="relative aspect-square">
+          <div className="relative h-48">
             <img
               src={props.image || "/placeholder.png"}
               alt={props.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-center"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
@@ -71,21 +71,10 @@ const ProductCard = (props: Props) => {
                 ))}
               </div>
 
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mt-auto">
                 <Store className="h-4 w-4" />
                 <span className="truncate">{props.vendor.name}</span>
               </div>
-            </div>
-
-            <div className="mt-4 pt-4 border-t border-border">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full btn-primary group flex items-center justify-center gap-2"
-              >
-                <ShoppingCart className="h-4 w-4" />
-                <span>Add to Cart</span>
-              </motion.button>
             </div>
           </div>
         </div>

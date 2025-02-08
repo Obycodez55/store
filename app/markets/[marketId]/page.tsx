@@ -11,6 +11,7 @@ import ProductCard from "@/app/components/ProductCard";
 import { MapPin, Calendar, Info, Package } from "lucide-react";
 import { PageTransition } from "@/app/components/PageTransition";
 import { UserMenu } from "@/app/components/UserMenu";
+import ProductCardSkeleton from "@/app/components/ProductCardSkeleton";
 
 // Animation variants
 const containerVariants = {
@@ -239,9 +240,13 @@ const Market = () => {
                   {Array(8)
                     .fill(0)
                     .map((_, i) => (
-                      <div key={i} className="animate-pulse">
-                        <div className="bg-card rounded-lg h-[300px]" />
-                      </div>
+                      <motion.div
+                        key={i}
+                        variants={itemVariants}
+                        className="animate-pulse"
+                      >
+                        <ProductCardSkeleton />
+                      </motion.div>
                     ))}
                 </div>
               ) : (
