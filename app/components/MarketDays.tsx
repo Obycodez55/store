@@ -1,3 +1,4 @@
+import moment from 'moment';
 import React, { useState, useEffect } from 'react';
 
 interface MarketDaysDisplayProps {
@@ -54,7 +55,7 @@ export const MarketDaysDisplay: React.FC<MarketDaysDisplayProps> = ({
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 className="text-lg font-medium text-gray-900">Last Market Day</h3>
             <p className="mt-2 text-2xl font-bold text-green-600">
-              {new Date(lastMarketDay).toLocaleDateString()}
+                {moment(lastMarketDay).format('MMMM Do YYYY')}
             </p>
           </div>
 
@@ -62,7 +63,7 @@ export const MarketDaysDisplay: React.FC<MarketDaysDisplayProps> = ({
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 className="text-lg font-medium text-gray-900">Next Market Day</h3>
             <p className="mt-2 text-2xl font-bold text-blue-600">
-              {new Date(nextMarketDay).toLocaleDateString()}
+                {moment(nextMarketDay).format('MMMM Do YYYY')}
             </p>
           </div>
 

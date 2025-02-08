@@ -2,18 +2,25 @@
 import { useCallback, useState, useEffect, Fragment } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Listbox, Transition } from "@headlessui/react";
-import { useQuery } from "@tanstack/react-query";
 import { ChevronDown, Menu, X } from "lucide-react";
 import MarketCard from "./components/MarketCard";
-import { Markets } from "../data/markets";
 import { signOut } from "next-auth/react";
-import { Market, MarketSearch } from "./components/MarketSearch";
+import { MarketSearch } from "./components/MarketSearch";
 import { useRouter } from "next/navigation";
 import { SuggestMarketModal } from "./components/MarketSuggestModal";
 import debounce from "lodash/debounce";
+import { useMarkets } from "./hooks/useMarkets";
+import { Market } from "@/types/market";
+import moment from "moment";
 
 // Types
-type MarketData = Omit<Market, "id" | "image" | "images">;
+type MarketData = {
+  name: string;
+  description: string;
+  location: string;
+  prevDate: string;
+  nextDate: string;
+}
 
 type FilterOption = {
   id: string;
@@ -39,32 +46,24 @@ const MarketCardSkeleton = () => (
 );
 
 export function Home() {
+  const { data: markets, isLoading } = useMarkets();
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState(sortOptions[0]);
-  const [filteredMarkets, setFilteredMarkets] = useState(Markets);
+  const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([]);
   const router = useRouter();
 
-  // Simulated data fetching with react-query
-  const { data: markets, isLoading } = useQuery({
-    queryKey: ["markets"],
-    queryFn: async () => {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      return Markets;
-    }
-  });
 
   // Debounced sort function
   const sortMarkets = useCallback(
     debounce((option: FilterOption) => {
-      let sorted = markets ? [...markets] : [];
+      let sorted = Array.isArray(markets) ? [...markets] : [];
       switch (option.value) {
         case "newest":
-          sorted = sorted.sort((a, b) => Number(b.id) - Number(a.id));
+          sorted = sorted.sort((a, b) => moment(b.createdAt).valueOf() - moment(a.createdAt).valueOf());
           break;
         case "oldest":
-          sorted = sorted.sort((a, b) => Number(a.id) - Number(b.id));
+          sorted = sorted.sort((a, b) => moment(a.createdAt).valueOf() - moment(b.createdAt).valueOf());
           break;
         case "alphabetical":
           sorted = sorted.sort((a, b) => a.name.localeCompare(b.name));
@@ -121,7 +120,7 @@ export function Home() {
 
           <div className="flex-grow max-w-2xl mx-8">
             <MarketSearch
-              markets={Markets}
+              markets={Array.isArray(markets) ? markets : []}
               onMarketSelect={handleMarketSelect}
               onSuggestMarket={() => setShowSuggestionModal(true)}
             />
@@ -178,7 +177,7 @@ export function Home() {
               >
                 <div className="w-full">
                   <MarketSearch
-                    markets={Markets}
+                    markets={Array.isArray(markets) ? markets : []}
                     onMarketSelect={handleMarketSelect}
                     onSuggestMarket={() => setShowSuggestionModal(true)}
                   />

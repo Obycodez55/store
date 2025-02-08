@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Search, Plus } from "lucide-react";
-import { Markets } from "../../data/markets";
-
-export type Market = (typeof Markets)[0];
+import { Market } from "@/types/market";
 
 interface MarketSearchProps {
   markets: Market[];

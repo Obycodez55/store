@@ -22,6 +22,8 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt 
 }
 
 model Account {
@@ -69,19 +71,25 @@ model Market {
   nextDate    DateTime
   vendors     Vendor[]
   images      MarketImages[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt 
 }
 
 model MarketImages {
-  id       String @id @default(cuid())
-  url      String
-  market   Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
-  marketId String
+  id        String   @id @default(cuid())
+  url       String
+  market    Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  marketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt 
 }
 
 model MarketSuggestions {
-  id          String @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt 
 }
 
 model Vendor {
@@ -92,17 +100,21 @@ model Vendor {
   marketId    String
   market      Market    @relation(fields: [marketId], references: [id], onDelete: Cascade)
   products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt 
 }
 
 model Product {
-  id          String  @id @default(cuid())
+  id          String   @id @default(cuid())
   name        String
   description String?
   image       String?
   price       Float
   vendorId    String
   tags        Tags[]
-  vendor      Vendor  @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt 
 }
 
 enum Tags {

@@ -84,7 +84,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
+    <div className="md:h-screen min-h-screen w-full grid lg:grid-cols-2">
       {/* Left side - Image with animated overlay */}
       <motion.div 
         className="hidden lg:block relative overflow-hidden"
@@ -202,7 +202,7 @@ const Auth = () => {
                     {isLoading && (
                       <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    {isLogin ? "Sign in" : "Create account"}
+                    {isLoading ? "Processing..." : isLogin ? "Sign in" : "Create account"}
                   </Button>
                 </form>
               </CardContent>
@@ -217,7 +217,7 @@ const Auth = () => {
                       form.reset();
                     }}
                   >
-                    {isLogin ? "Sign up" : "Sign in"}
+                    {isLogin ? "Sign up" : "Login"}
                   </Button>
                 </p>
               </CardFooter>

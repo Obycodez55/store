@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     siteName: 'Marketplace',
   },
   // Basic manifest for PWA support
-  manifest: '/manifest.json',
+  // manifest: '/manifest.json',
 };
 
 export default function RootLayout({

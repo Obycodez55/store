@@ -28,11 +28,3 @@ export function getMarketDays(prevDate: string, nextDate: string) {
         nextMarketDay: nextMarketDay.format('YYYY-MM-DD')
     };
 }
-
-// Example usage
-try {
-    const marketDays = getMarketDays('2021-10-01', '2021-10-06');
-    console.log(marketDays);
-} catch (error: any) {
-    console.error(error.message);
-}
