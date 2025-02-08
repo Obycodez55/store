@@ -32,7 +32,6 @@ const authSchema = z.object({
 type AuthFormValues = z.infer<typeof authSchema>;
 
 const Auth = () => {
-  const { status } = useSession();
   const router = useRouter();
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);

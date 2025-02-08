@@ -21,6 +21,7 @@ export async function GET(req: Request, { params }: { params: { marketId: string
 
         return NextResponse.json(market);
     } catch (error) {
+        console.log(error);
         return NextResponse.json({ error: "Failed to fetch market" }, { status: 500 });
     }
 }
