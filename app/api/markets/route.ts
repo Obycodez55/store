@@ -16,6 +16,7 @@ export async function GET() {
         });
         return NextResponse.json(markets);
     } catch (error) {
+        console.log(error);
         return NextResponse.json({ error: "Failed to fetch markets" }, { status: 500 });
     }
 }
