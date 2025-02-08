@@ -265,7 +265,14 @@ const Market = () => {
                         image={product.image || ""}
                         category={product.tags}
                         vendor={{
-                          name: product.vendor.name
+                          name: product.vendor.name,
+                          email: product.vendor.email ?? undefined,
+                          phone: product.vendor.phone ?? undefined,
+                          website: product.vendor.website ?? undefined,
+                          market: {
+                            name: market.name,
+                            location: market.location
+                          }
                         }}
                       />
                     </motion.div>

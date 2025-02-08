@@ -95,8 +95,9 @@ model MarketSuggestions {
 model Vendor {
   id          String    @id @default(cuid())
   name        String
-  description String?
-  image       String?
+  email       String?
+  phone       String?
+  website     String?
   marketId    String
   market      Market    @relation(fields: [marketId], references: [id], onDelete: Cascade)
   products    Product[]

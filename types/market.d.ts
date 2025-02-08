@@ -41,6 +41,9 @@ interface Product {
     vendor: {
         id: string;
         name: string;
+        email: string | null;
+        phone: string | null;
+        website: string | null;
         createdAt: Date;
         updatedAt: Date;
         market: {
