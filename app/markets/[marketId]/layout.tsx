@@ -5,7 +5,5 @@ export default function MarketLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <ProtectedRoute>
-    {children}
-    </ProtectedRoute>;
+  return <ProtectedRoute>{children}</ProtectedRoute>;
 }

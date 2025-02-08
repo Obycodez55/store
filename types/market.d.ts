@@ -1,3 +1,4 @@
+import { Tags } from "@prisma/client";
 
 export interface Market {
     id: string;
@@ -28,11 +29,30 @@ export interface Vendor {
     updatedAt: date;
 }
 
-export interface Product {
+interface Product {
     id: string;
     name: string;
     price: number;
     description: string | null;
+    tags: Tags[];
+    image: string | null;
     createdAt: Date;
-    updatedAt: date;
+    updatedAt: Date;
+    vendor: {
+        id: string;
+        name: string;
+        createdAt: Date;
+        updatedAt: Date;
+        market: {
+            id: string;
+            name: string;
+            location: string;
+            description: string;
+            image: string;
+            prevDate: Date;
+            nextDate: Date;
+            createdAt: Date;
+            updatedAt: Date;
+        }
+    }
 }

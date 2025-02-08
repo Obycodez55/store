@@ -22,11 +22,11 @@ const productImages = [
 async function seed() {
   console.log('🌱 Seeding database...');
 
-  // await prisma.market.deleteMany();
-  // await prisma.vendor.deleteMany();
-  // await prisma.product.deleteMany();
+  await prisma.market.deleteMany();
+  await prisma.vendor.deleteMany();
+  await prisma.product.deleteMany();
 
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 63; i++) {
     const market = await prisma.market.create({
       data: {
         name: faker.company.name(),
