@@ -10,6 +10,7 @@ import { useMarkets, useProducts } from "@/app/hooks/useMarkets";
 import ProductCard from "@/app/components/ProductCard";
 import { MapPin, Calendar, Info, Package } from "lucide-react";
 import { PageTransition } from "@/app/components/PageTransition";
+import { UserMenu } from "@/app/components/UserMenu";
 
 // Animation variants
 const containerVariants = {
@@ -129,6 +130,25 @@ const Market = () => {
       <div className="min-h-screen bg-background">
         {/* Hero Section with Image Slider */}
         <div className="relative h-[60vh] md:h-[70vh]">
+          {/* Header */}
+          <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/60 to-transparent">
+            <div className="container mx-auto px-4 py-4">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <motion.a
+                  href="/"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-white hover:text-white/80 transition-colors"
+                >
+                  <span className="text-xl font-display font-bold">
+                    Market<span className="text-primary-300">Place</span>
+                  </span>
+                </motion.a>
+                <UserMenu />
+              </div>
+            </div>
+          </div>
+
           <AnimatePresence mode="wait">
             <motion.img
               key={currentImageIndex}

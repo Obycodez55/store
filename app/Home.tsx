@@ -13,6 +13,7 @@ import { useMarkets } from "./hooks/useMarkets";
 import { Market } from "@/types/market";
 import moment from "moment";
 import { PageTransition } from "./components/PageTransition";
+import { UserMenu } from "./components/UserMenu";
 
 // Animation variants
 const containerVariants = {
@@ -157,24 +158,7 @@ export function Home() {
               />
             </div>
 
-            <div className="flex items-center gap-4">
-              <motion.a
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                href="/auth"
-                className="btn-secondary"
-              >
-                Login
-              </motion.a>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => signOut({ callbackUrl: "/auth" })}
-                className="btn-primary"
-              >
-                Logout
-              </motion.button>
-            </div>
+            <UserMenu />
           </div>
 
           {/* Mobile Navigation */}
@@ -204,7 +188,7 @@ export function Home() {
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="px-4 pb-4 space-y-4 overflow-hidden border-t border-border"
+                  className="px-4 pb-4 space-y-4 overflow-hidden border-t border-border w-full"
                 >
                   <div className="w-full">
                     <MarketSearch
@@ -213,21 +197,8 @@ export function Home() {
                       onSuggestMarket={() => setShowSuggestionModal(true)}
                     />
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <motion.a
-                      whileTap={{ scale: 0.95 }}
-                      href="/auth"
-                      className="btn-secondary w-full"
-                    >
-                      Login
-                    </motion.a>
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => signOut({ callbackUrl: "/auth" })}
-                      className="btn-primary w-full"
-                    >
-                      Logout
-                    </motion.button>
+                  <div className="w-full">
+                    <UserMenu />
                   </div>
                 </motion.div>
               )}
