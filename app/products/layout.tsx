@@ -1,8 +1,8 @@
 import { Metadata, Viewport } from "next/types";
 
 export const metadata: Metadata = {
-  title: "Products | MarketPlace",
-  description: "Browse all available products in our marketplace"
+  title: "Browse Products",
+  description: "Browse all available products from local markets in your area."
 };
 
 export const viewport: Viewport = {

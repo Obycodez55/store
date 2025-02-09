@@ -1,41 +1,46 @@
 import type { Metadata } from "next";
-import { Inter } from 'next/font/google';
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./Providers";
 import { ToasterProvider } from "./components/Toaster";
 
 // Initialize Inter font
 const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap"
 });
 
 export const metadata: Metadata = {
-  title: "Marketplace",
-  description: "Your modern, accessible marketplace platform",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#121212" }
-  ],
-  // Improve SEO and social sharing
-  openGraph: {
-    type: 'website',
-    title: 'Marketplace',
-    description: 'Your modern, accessible marketplace platform',
-    siteName: 'Marketplace',
+  title: {
+    template: "%s | MarketPlace",
+    default: "MarketPlace - Discover Local Markets"
   },
-  // Basic manifest for PWA support
-  // manifest: '/manifest.json',
+  description:
+    "Find and explore the best local markets in your area. From fresh produce to handmade crafts.",
+  icons: {
+    icon: [
+      {
+        url: "/favicon.ico",
+        sizes: "32x32"
+      },
+      {
+        url: "/icon.svg",
+        type: "image/svg+xml"
+      }
+    ],
+    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon.ico"
+  },
+  manifest: "/site.webmanifest"
 };
 
 export default function RootLayout({
   children
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html 
-      lang="en" 
+    <html
+      lang="en"
       className={`${inter.variable} h-full scroll-smooth`}
       suppressHydrationWarning // Prevents dark mode flicker
     >
@@ -47,7 +52,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body 
+      <body
         className={`
           min-h-full
           antialiased
@@ -65,22 +70,17 @@ export default function RootLayout({
       >
         <Providers>
           {/* Skip to main content link for accessibility */}
-          <a 
-            href="#main-content" 
-            className="skip-to-content"
-          >
+          <a href="#main-content" className="skip-to-content">
             Skip to main content
           </a>
-          
+
           {/* Main content wrapper */}
-          <div id="main-content">
-            {children}
-          </div>
-          
+          <div id="main-content">{children}</div>
+
           {/* Toast notifications */}
           <ToasterProvider />
         </Providers>
       </body>
     </html>
   );
-};
+}
