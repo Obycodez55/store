@@ -40,7 +40,7 @@ export const UserMenu = () => {
     >
       <div className="flex items-center gap-2 text-sm text-muted-foreground w-full md:w-auto">
         <User className="h-4 w-4 shrink-0" />
-        <span className="truncate max-w-[200px]">{session.user?.email}</span>
+        <span className="truncate max-w-[200px]">{session?.user?.email}</span>
       </div>
       <Button
         variant="outline"

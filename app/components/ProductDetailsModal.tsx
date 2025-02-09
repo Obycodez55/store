@@ -6,26 +6,27 @@ import { Button } from "@/components/ui/button";
 import { X, Copy, MapPin, Phone, Mail, Globe, Store } from "lucide-react";
 import { toast } from "sonner";
 
-interface ProductDetailsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  product: {
+export interface ModalProduct{
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  tags: string[];
+  vendor: {
     name: string;
-    description: string;
-    price: number;
-    image: string;
-    category: string[];
-    vendor: {
+    email?: string;
+    phone?: string;
+    website?: string;
+    market: {
       name: string;
-      email?: string;
-      phone?: string;
-      website?: string;
-      market: {
-        name: string;
-        location: string;
-      };
+      location: string;
     };
   };
+}
+ interface ProductDetailsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  product: ModalProduct
 }
 
 const backdropVariants = {

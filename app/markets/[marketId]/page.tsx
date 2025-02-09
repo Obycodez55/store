@@ -12,6 +12,7 @@ import { MapPin, Calendar, Info, Package } from "lucide-react";
 import { PageTransition } from "@/app/components/PageTransition";
 import { UserMenu } from "@/app/components/UserMenu";
 import ProductCardSkeleton from "@/app/components/ProductCardSkeleton";
+import Link from "next/link";
 
 // Animation variants
 const containerVariants = {
@@ -116,11 +117,11 @@ const Market = () => {
             Market not found
           </h1>
           <p className="text-muted-foreground">
-            The market you're looking for doesn't exist.
+            The market you&apos;re looking for doesn&apos;t exist.
           </p>
-          <a href="/" className="btn-primary inline-flex">
+          <Link href="/" className="btn-primary inline-flex">
             Go Home
-          </a>
+          </Link>
         </div>
       </div>
     );

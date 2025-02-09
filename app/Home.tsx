@@ -2,9 +2,8 @@
 import { useCallback, useState, useEffect, Fragment } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Listbox, Transition } from "@headlessui/react";
-import { ChevronDown, Menu, X, MapPin } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import MarketCard from "./components/MarketCard";
-import { signOut } from "next-auth/react";
 import { MarketSearch } from "./components/MarketSearch";
 import { useRouter } from "next/navigation";
 import { SuggestMarketModal } from "./components/MarketSuggestModal";

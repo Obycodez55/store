@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ShoppingCart, Tag, Store } from "lucide-react";
+import { Tag, Store } from "lucide-react";
 import { ProductDetailsModal } from "./ProductDetailsModal";
 
 type Props = {
@@ -83,7 +83,7 @@ const ProductCard = (props: Props) => {
       <ProductDetailsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        product={props}
+        product={{...props, tags: props.category}}
       />
     </>
   );

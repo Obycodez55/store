@@ -10,19 +10,7 @@ const container = {
   }
 };
 
-const item = {
-  hidden: { opacity: 0, scale: 0.8 },
-  show: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      duration: 0.8,
-      repeat: Infinity,
-      repeatType: "reverse",
-      ease: [0.25, 0.1, 0.25, 1]
-    }
-  }
-};
+// Remove unused animation variant
 
 export const LoadingScreen = () => {
   return (
@@ -34,15 +22,51 @@ export const LoadingScreen = () => {
         className="flex items-center gap-2"
       >
         <motion.div
-          variants={item}
+          variants={{
+            hidden: { opacity: 0, scale: 0.8 },
+            show: {
+              opacity: 1,
+              scale: 1,
+              transition: {
+                duration: 0.8,
+                repeat: Infinity,
+                repeatType: "loop",
+                ease: [0.25, 0.1, 0.25, 1]
+              }
+            }
+          }}
           className="w-4 h-4 rounded-full bg-primary"
         />
         <motion.div
-          variants={item}
+          variants={{
+            hidden: { opacity: 0, scale: 0.8 },
+            show: {
+              opacity: 1,
+              scale: 1,
+              transition: {
+                duration: 0.8,
+                repeat: Infinity,
+                repeatType: "loop",
+                ease: [0.25, 0.1, 0.25, 1]
+              }
+            }
+          }}
           className="w-4 h-4 rounded-full bg-primary"
         />
         <motion.div
-          variants={item}
+          variants={{
+            hidden: { opacity: 0, scale: 0.8 },
+            show: {
+              opacity: 1,
+              scale: 1,
+              transition: {
+                duration: 0.8,
+                repeat: Infinity,
+                repeatType: "loop",
+                ease: [0.25, 0.1, 0.25, 1]
+              }
+            }
+          }}
           className="w-4 h-4 rounded-full bg-primary"
         />
       </motion.div>
