@@ -3,13 +3,24 @@ import { Tags } from "@prisma/client";
 
 export const searchProducts = async (query: string, page: number, limit: number) => {
     const skip = (page - 1) * limit;
+
+    // Helper function to validate if a string is a valid Tag
+    const isValidTag = (tag: string): tag is Tags => {
+        return Object.values(Tags).includes(tag as Tags);
+    };
+
+    // Filter and validate tags from the query
+    const queryTags = query
+        .split(" ")
+        .filter(isValidTag);
+
     const products = await prisma.product.findMany({
         where: {
             ...(query ? {
                 OR: [
                     { name: { contains: query, mode: "insensitive" } },
                     { description: { contains: query, mode: "insensitive" } },
-                    { tags: { hasSome: query.split(" ") as Tags[] } },
+                    ...(queryTags.length > 0 ? [{ tags: { hasSome: queryTags } }] : []),
                     { vendor: { name: { contains: query, mode: "insensitive" } } }
                 ]
             } : {})
@@ -40,7 +51,7 @@ export const searchProducts = async (query: string, page: number, limit: number)
                 OR: [
                     { name: { contains: query, mode: "insensitive" } },
                     { description: { contains: query, mode: "insensitive" } },
-                    { tags: { hasSome: query.split(" ") as Tags[] } },
+                    ...(queryTags.length > 0 ? [{ tags: { hasSome: queryTags } }] : []),
                     { vendor: { name: { contains: query, mode: "insensitive" } } }
                 ]
             } : {})
