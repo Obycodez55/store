@@ -146,6 +146,18 @@ const Market = () => {
                     Market<span className="text-primary-300">Place</span>
                   </span>
                 </motion.a>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="order-last md:order-none"
+                >
+                  <Link
+                    href="/products"
+                    className="btn-secondary bg-white/10 hover:bg-white/20 text-white border-white/20"
+                  >
+                    Browse Products
+                  </Link>
+                </motion.div>
                 <UserMenu />
               </div>
             </div>

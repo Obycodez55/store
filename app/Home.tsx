@@ -14,6 +14,7 @@ import moment from "moment";
 import { PageTransition } from "./components/PageTransition";
 import { UserMenu } from "./components/UserMenu";
 import { LoadingGrid } from "./components/LoadingGrid";
+import Link from "next/link";
 
 // Animation variants
 const containerVariants = {
@@ -148,6 +149,16 @@ export function Home() {
               />
             </div>
 
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mr-4"
+            >
+              <Link href="/products" className="btn-secondary">
+                Browse Products
+              </Link>
+            </motion.div>
+
             <UserMenu />
           </div>
 
@@ -187,6 +198,18 @@ export function Home() {
                       onSuggestMarket={() => setShowSuggestionModal(true)}
                     />
                   </div>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="w-full"
+                  >
+                    <Link
+                      href="/products"
+                      className="btn-secondary w-full justify-center"
+                    >
+                      Browse Products
+                    </Link>
+                  </motion.div>
                   <div className="w-full">
                     <UserMenu />
                   </div>
