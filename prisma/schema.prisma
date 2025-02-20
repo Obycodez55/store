@@ -23,9 +23,9 @@ model User {
   accounts      Account[]
   sessions      Session[]
   vendor        Vendor?   @relation(fields: [vendorId], references: [id])
+  vendorId      String?   @unique
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  vendorId      String    @unique
 }
 
 model Account {
@@ -73,7 +73,6 @@ model Market {
   nextDate    DateTime
   vendors     Vendor[]
   images      MarketImages[]
-  products    Product[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 }
@@ -104,22 +103,22 @@ model Vendor {
   marketId  String
   market    Market    @relation(fields: [marketId], references: [id], onDelete: Cascade)
   products  Product[]
+  user      User?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  User      User?
-  userId    String    @unique
 }
 
 model Product {
   id          String   @id @default(cuid())
   name        String
-  description String
+  description String?
+  image       String?
   price       Float
-  imageUrl    String
+  vendorId    String
+  tags        Tags[]
+  vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  marketId    String
-  market      Market   @relation(fields: [marketId], references: [id])
 }
 
 enum Tags {

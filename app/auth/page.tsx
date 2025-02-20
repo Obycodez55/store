@@ -13,7 +13,23 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Icons } from "../components/Icons";
-import { ArrowLeft, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import {
+  ArrowLeft,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  User,
+  Phone,
+  Globe
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 
 // Form validation schema
 const loginSchema = z.object({
@@ -28,7 +44,11 @@ const loginSchema = z.object({
 
 const registerSchema = loginSchema
   .extend({
-    confirmPassword: z.string()
+    confirmPassword: z.string(),
+    name: z.string().min(2, "Name must be at least 2 characters"),
+    marketId: z.string().min(1, "Please select a market"),
+    website: z.string().url("Please enter a valid website URL").optional(),
+    phone: z.string().min(10, "Please enter a valid phone number").optional()
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -61,13 +81,18 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [markets, setMarkets] = useState<{ id: string; name: string }[]>([]);
 
   const form = useForm<AuthFormValues>({
     resolver: zodResolver(isLogin ? loginSchema : registerSchema),
     defaultValues: {
       email: "",
       password: "",
-      confirmPassword: ""
+      confirmPassword: "",
+      name: "",
+      marketId: "",
+      phone: "",
+      website: ""
     }
   });
 
@@ -75,6 +100,24 @@ const Auth = () => {
   useEffect(() => {
     form.reset();
   }, [isLogin, form]);
+
+  // Fetch markets for the dropdown
+  useEffect(() => {
+    const fetchMarkets = async () => {
+      const response = await fetch("/api/markets");
+      const data = await response.json();
+      setMarkets(
+        data.map((market: any) => ({
+          id: market.id,
+          name: market.name
+        }))
+      );
+    };
+
+    if (!isLogin) {
+      fetchMarkets();
+    }
+  }, [isLogin]);
 
   const onSubmit = useCallback(
     async (data: AuthFormValues) => {
@@ -92,11 +135,20 @@ const Auth = () => {
         } else {
           await register({
             email: data.email,
-            password: data.password
+            password: data.password,
+            name: data.name,
+            marketId: data.marketId,
+            phone: data.phone,
+            website: data.website
           });
           toast.success("Account created!", {
             description: "Your account has been successfully created."
           });
+          await login({
+            email: data.email,
+            password: data.password
+          });
+          router.push("/");
         }
       } catch (error: any) {
         toast.error("Authentication failed", {
@@ -227,6 +279,94 @@ const Auth = () => {
                       </p>
                     )}
                   </div>
+
+                  {!isLogin && (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Full Name</Label>
+                        <div className="relative">
+                          <Input
+                            id="name"
+                            placeholder="Enter your full name"
+                            {...form.register("name")}
+                            disabled={isLoading}
+                            className="pl-10"
+                          />
+                          <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                        </div>
+                        {form.formState.errors.name && (
+                          <p className="text-sm text-destructive">
+                            {form.formState.errors.name.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="marketId">Select Market</Label>
+                        <Select
+                          onValueChange={(value) =>
+                            form.setValue("marketId", value)
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a market" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {markets.map((market) => (
+                              <SelectItem key={market.id} value={market.id}>
+                                {market.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {form.formState.errors.marketId && (
+                          <p className="text-sm text-destructive">
+                            {form.formState.errors.marketId.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <div className="relative">
+                          <Input
+                            id="phone"
+                            type="tel"
+                            placeholder="Enter your phone number"
+                            {...form.register("phone")}
+                            disabled={isLoading}
+                            className="pl-10"
+                          />
+                          <Phone className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                        </div>
+                        {form.formState.errors.phone && (
+                          <p className="text-sm text-destructive">
+                            {form.formState.errors.phone.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="website">Website</Label>
+                        <div className="relative">
+                          <Input
+                            id="website"
+                            type="url"
+                            placeholder="Enter your website URL"
+                            {...form.register("website")}
+                            disabled={isLoading}
+                            className="pl-10"
+                          />
+                          <Globe className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                        </div>
+                        {form.formState.errors.website && (
+                          <p className="text-sm text-destructive">
+                            {form.formState.errors.website.message}
+                          </p>
+                        )}
+                      </div>
+                    </>
+                  )}
 
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>

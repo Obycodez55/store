@@ -14,18 +14,24 @@ export async function login({ email, password }: { email: string; password: stri
     return result;
 }
 
-export async function register({ email, password }: { email: string; password: string }) {
-    try {
-        const response = await axios.post("/api/auth/register", {
-            email,
-            password
-        });
-        if (response.status === 201) login({ email, password });
-        return response.data;
-    } catch (error) {
-        if (error instanceof AxiosError && error.response) {
-            throw new Error(error.response.data.message);
-        }
-        throw error;
+export const register = async (data: {
+    email: string;
+    password: string;
+    name: string;
+    marketId: string;
+    phone?: string;
+    website?: string;
+}) => {
+    const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Registration failed');
     }
-}
+
+    return response.json();
+};
