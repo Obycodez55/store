@@ -22,8 +22,10 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  vendor        Vendor?   @relation(fields: [vendorId], references: [id])
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt 
+  updatedAt     DateTime  @updatedAt
+  vendorId      String    @unique
 }
 
 model Account {
@@ -71,8 +73,9 @@ model Market {
   nextDate    DateTime
   vendors     Vendor[]
   images      MarketImages[]
+  products    Product[]
   createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt 
+  updatedAt   DateTime       @updatedAt
 }
 
 model MarketImages {
@@ -81,7 +84,7 @@ model MarketImages {
   market    Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
   marketId  String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt 
+  updatedAt DateTime @updatedAt
 }
 
 model MarketSuggestions {
@@ -89,33 +92,34 @@ model MarketSuggestions {
   name        String
   description String
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt 
+  updatedAt   DateTime @updatedAt
 }
 
 model Vendor {
-  id          String    @id @default(cuid())
-  name        String
-  email       String?
-  phone       String?
-  website     String?
-  marketId    String
-  market      Market    @relation(fields: [marketId], references: [id], onDelete: Cascade)
-  products    Product[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt 
+  id        String    @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  website   String?
+  marketId  String
+  market    Market    @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  User      User?
+  userId    String    @unique
 }
 
 model Product {
   id          String   @id @default(cuid())
   name        String
-  description String?
-  image       String?
+  description String
   price       Float
-  vendorId    String
-  tags        Tags[]
-  vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  imageUrl    String
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt 
+  updatedAt   DateTime @updatedAt
+  marketId    String
+  market      Market   @relation(fields: [marketId], references: [id])
 }
 
 enum Tags {
