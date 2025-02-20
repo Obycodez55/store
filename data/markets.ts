@@ -73,13 +73,13 @@ export const Markets = [
     },
     {
         id: '8',
-        name: 'City Park Market',
-        description: 'A lively market in the city park.',
+        name: 'Ojoo Market',
+        description: 'A market know for variety of products from agricultural products to kitchen utensils and clothing items. It is also very famous for okirika.',
         image: '/images/market_5.jpg',
         location: '505 Park Ln, Metropolis',
         images: ["/images/market_2.jpg", "/images/market_3.jpg", "/images/market_4.jpg", "/images/market_5.jpg"],
-        prevDate: '2021-03-01',
-        nextDate: '2021-03-15',
+        prevDate: '2024-12-16',
+        nextDate: '2024-12-24',
     },
     {
         id: '9',
