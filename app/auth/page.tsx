@@ -131,7 +131,7 @@ const Auth = () => {
           toast.success("Welcome back!", {
             description: "You've successfully signed in."
           });
-          router.push("/");
+          router.push("/dashboard");
         } else {
           await register({
             email: data.email,
@@ -148,7 +148,7 @@ const Auth = () => {
             email: data.email,
             password: data.password
           });
-          router.push("/");
+          router.push("/dashboard");
         }
       } catch (error: any) {
         toast.error("Authentication failed", {
