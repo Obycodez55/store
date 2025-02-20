@@ -1,4 +1,3 @@
-import { ProtectedRoute } from "@/app/components/ProtectedRoute";
 import { Metadata } from "next/types";
 
 export const metadata: Metadata = {
@@ -14,5 +13,5 @@ export default function MarketLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <ProtectedRoute>{children}</ProtectedRoute>;
+  return {children};
 }

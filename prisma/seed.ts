@@ -1,23 +1,40 @@
 import { PrismaClient, Tags } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import * as XLSX from 'xlsx';
+import { join } from 'path';
 
 const prisma = new PrismaClient();
 
 const marketImages = [
-    "/images/market_2.jpg", 
-    "/images/market_3.jpg", 
-    "/images/market_4.jpg", 
-    "/images/market_5.jpg", 
-    "/images/market.jpg"
+  "/images/market_2.jpg",
+  "/images/market_3.jpg",
+  "/images/market_4.jpg",
+  "/images/market_5.jpg",
+  "/images/market.jpg"
 ];
 
 const productImages = [
-    "/images/market_2.jpg", 
-    "/images/market_3.jpg", 
-    "/images/market_4.jpg", 
-    "/images/market_5.jpg", 
-    "/images/market.jpg"
+  "/images/market_2.jpg",
+  "/images/market_3.jpg",
+  "/images/market_4.jpg",
+  "/images/market_5.jpg",
+  "/images/market.jpg"
 ];
+
+// Read market data from Excel file
+function readMarketData() {
+  const workbook = XLSX.readFile(join(__dirname, 'markets.xlsx'));
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+  const data = XLSX.utils.sheet_to_json(worksheet);
+
+  return data.map((row: any) => ({
+    name: row['Market Name'],
+    location: row['Location'] || 'Location not specified',
+    prevDate: new Date(),
+    nextDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+  }));
+}
 
 async function seed() {
   console.log('🌱 Seeding database...');
@@ -26,47 +43,45 @@ async function seed() {
   await prisma.vendor.deleteMany();
   await prisma.product.deleteMany();
 
-  for (let i = 0; i < 63; i++) {
-    // Generate nextDate within next 14 days
-    const nextDate = faker.date.future({ years: 0.0384 }); // ~14 days
-    // Generate prevDate within 14 days before nextDate
-    const prevDate = faker.date.between({
-      from: new Date(nextDate.getTime() - 14 * 24 * 60 * 60 * 1000),
-      to: nextDate
-    });
+  const marketData = readMarketData();
 
-    const market = await prisma.market.create({
-      data: {
-        name: faker.company.name(),
-        description: faker.lorem.sentence(),
-        image: faker.helpers.arrayElement(marketImages),
-        location: faker.location.city(),
-        prevDate,
-        nextDate,
-        images: {
-          create: marketImages.map((url) => ({ url })),
+  for (const marketInfo of marketData) {
+    try {
+      const market = await prisma.market.create({
+        data: {
+          name: marketInfo.name,
+          description: faker.lorem.sentence(),
+          image: faker.helpers.arrayElement(marketImages),
+          location: marketInfo.location,
+          prevDate: marketInfo.prevDate,
+          nextDate: marketInfo.nextDate,
+          images: {
+            create: marketImages.map((url) => ({ url })),
+          },
+          vendors: {
+            create: Array.from({ length: 3 }, () => ({
+              name: faker.company.name(),
+              email: faker.internet.email(),
+              phone: faker.phone.number(),
+              website: faker.internet.url(),
+              products: {
+                create: Array.from({ length: 5 }, () => ({
+                  name: faker.commerce.productName(),
+                  description: faker.commerce.productDescription(),
+                  image: faker.helpers.arrayElement(productImages),
+                  price: parseFloat(faker.commerce.price({ min: 5, max: 50 })),
+                  tags: [faker.helpers.arrayElement(Object.values(Tags))],
+                })),
+              },
+            })),
+          },
         },
-        vendors: {
-          create: Array.from({ length: 3 }, () => ({
-            name: faker.company.name(),
-            email: faker.internet.email(),
-            phone: faker.phone.number(),
-            website: faker.internet.url(),
-            products: {
-              create: Array.from({ length: 5 }, () => ({
-                name: faker.commerce.productName(),
-                description: faker.commerce.productDescription(),
-                image: faker.helpers.arrayElement(productImages),
-                price: parseFloat(faker.commerce.price({ min: 5, max: 50 })),
-                tags: [faker.helpers.arrayElement(Object.values(Tags))],
-              })),
-            },
-          })),
-        },
-      },
-    });
+      });
 
-    console.log(`✅ Created market: ${market.name}`);
+      console.log(`✅ Created market: ${market.name}`);
+    } catch (error) {
+      console.error(`❌ Error creating market ${marketInfo.name}:`, error);
+    }
   }
 
   console.log('🎉 Seeding completed.');
