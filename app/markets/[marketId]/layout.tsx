@@ -13,5 +13,5 @@ export default function MarketLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return {children};
+  return <>{children}</>;
 }
