@@ -1,279 +1,192 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import Image from "next/image";
-import { Product } from "@prisma/client";
-import axios, { AxiosResponse } from "axios";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
-import { Pencil, Trash2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Store, Package, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { PageTransition } from "@/app/components/PageTransition";
 
-interface ProductFormData {
+interface VendorDashboardData {
+  id: string;
   name: string;
-  description: string;
-  price: string;
-  image: FileList;
+  email: string | null;
+  phone: string | null;
+  website: string | null;
+  market: {
+    id: string;
+    name: string;
+    location: string;
+    description: string;
+  };
+  goodsSold: string[];
 }
 
-export default function DashboardPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const { register, handleSubmit, reset, setValue } =
-    useForm<ProductFormData>();
+export default function Dashboard() {
   const { data: session } = useSession();
+  const [newItem, setNewItem] = useState("");
 
-  // Fetch vendor's products
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(
-          `/api/products?userId=${session?.user?.id}`
-        );
-        setProducts(response.data);
-      } catch (err) {
-        toast.error(
-          "Failed to fetch products: " +
-            (err instanceof Error ? err.message : "Unknown error")
-        );
-      }
-    };
-
-    if (session?.user?.id) {
-      fetchProducts();
+  const { data: vendorData, refetch } = useQuery<VendorDashboardData>({
+    queryKey: ["vendor-dashboard"],
+    queryFn: async () => {
+      const response = await fetch("/api/vendor/dashboard");
+      if (!response.ok) throw new Error("Failed to fetch vendor data");
+      return response.json();
     }
-  }, [session?.user?.id]);
+  });
 
-  // Add click outside handler
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
-        setIsModalOpen(false);
-        setEditingProduct(null);
-        reset();
-      }
-    }
+  const handleAddItem = async () => {
+    if (!newItem.trim()) return;
 
-    if (isModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isModalOpen, reset]);
-
-  const onSubmit = async (data: ProductFormData) => {
     try {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("description", data.description);
-      formData.append("price", data.price);
-      if (data.image[0]) {
-        formData.append("image", data.image[0]);
-      }
+      const response = await fetch("/api/vendor/goods", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ item: newItem.trim() })
+      });
 
-      let response: AxiosResponse;
-      if (editingProduct) {
-        // Update existing product
-        formData.append("id", editingProduct.id);
-        response = await axios.put(
-          `/api/products/${editingProduct.id}`,
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" }
-          }
-        );
-        setProducts(
-          products.map((p) => (p.id === editingProduct.id ? response.data : p))
-        );
-        toast.success("Product updated successfully");
-      } else {
-        // Create new product
-        response = await axios.post("/api/products", formData, {
-          headers: { "Content-Type": "multipart/form-data" }
-        });
-        setProducts([...products, response.data]);
-        toast.success("Product created successfully");
-      }
+      if (!response.ok) throw new Error("Failed to add item");
 
-      setIsModalOpen(false);
-      setEditingProduct(null);
-      reset();
+      toast.success("Item added successfully");
+      setNewItem("");
+      refetch();
     } catch (error) {
-      console.log(error);
-      toast.error(
-        editingProduct ? "Failed to update product" : "Failed to create product"
-      );
+      toast.error("Failed to add item");
     }
   };
 
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-    setValue("name", product.name);
-    setValue("description", product.description || "");
-    setValue("price", product.price.toString());
-    setIsModalOpen(true);
-  };
+  const handleRemoveItem = async (item: string) => {
+    try {
+      const response = await fetch("/api/vendor/goods", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ item })
+      });
 
-  const handleDelete = async (productId: string) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      try {
-        await axios.delete(`/api/products/${productId}`);
-        setProducts(products.filter((p) => p.id !== productId));
-        toast.success("Product deleted successfully");
-      } catch (error) {
-        console.log(error);
-        toast.error("Failed to delete product");
-      }
+      if (!response.ok) throw new Error("Failed to remove item");
+
+      toast.success("Item removed successfully");
+      refetch();
+    } catch (error) {
+      toast.error("Failed to remove item");
     }
   };
+
+  if (!session?.user) {
+    return null;
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">My Products</h1>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="bg-primary text-white px-6 py-2 rounded-lg shadow-md"
-          onClick={() => {
-            setEditingProduct(null);
-            reset();
-            setIsModalOpen(true);
-          }}
-        >
-          Add New Product
-        </motion.button>
-      </div>
-
-      <AnimatePresence>
-        {isModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          >
+    <PageTransition>
+      <div className="min-h-screen bg-background">
+        <main className="container mx-auto px-4 py-8">
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Market Info */}
             <motion.div
-              ref={modalRef}
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              className="bg-white rounded-lg p-6 w-full max-w-md"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-card rounded-lg border border-border p-6"
             >
-              <h2 className="text-2xl font-bold mb-4">
-                {editingProduct ? "Edit Product" : "Add New Product"}
-              </h2>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Name</label>
-                  <input
-                    {...register("name")}
-                    className="w-full border rounded-lg px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Description
-                  </label>
-                  <textarea
-                    {...register("description")}
-                    className="w-full border rounded-lg px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Price
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    {...register("price")}
-                    className="w-full border rounded-lg px-3 py-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    Image
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    {...register("image")}
-                    className="w-full border rounded-lg px-3 py-2"
-                  />
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setIsModalOpen(false);
-                      setEditingProduct(null);
-                      reset();
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit">
-                    {editingProduct ? "Update" : "Create"}
-                  </Button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
-          <motion.div
-            key={product.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="border rounded-lg overflow-hidden shadow-md"
-          >
-            <div className="relative h-48">
-              <Image
-                src={product.image || "/placeholder.jpg"}
-                alt={product.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="p-4">
-              <h3 className="text-xl font-semibold">{product.name}</h3>
-              <p className="text-gray-600 mt-2">{product.description}</p>
-              <p className="text-primary font-bold mt-2">
-                ${product.price.toFixed(2)}
-              </p>
-              <div className="flex justify-end space-x-2 mt-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEdit(product)}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(product.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+              <div className="flex items-center gap-2 mb-4">
+                <Store className="h-5 w-5 text-primary" />
+                <h2 className="text-xl font-semibold">Your Market</h2>
               </div>
-            </div>
-          </motion.div>
-        ))}
+              {vendorData?.market && (
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-medium">{vendorData.market.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {vendorData.market.location}
+                    </p>
+                  </div>
+                  <p className="text-sm">{vendorData.market.description}</p>
+                </div>
+              )}
+            </motion.div>
+
+            {/* Vendor Info */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-card rounded-lg border border-border p-6"
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <Store className="h-5 w-5 text-primary" />
+                <h2 className="text-xl font-semibold">Your Details</h2>
+              </div>
+              {vendorData && (
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-medium">{vendorData.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {vendorData.email}
+                    </p>
+                  </div>
+                  {vendorData.phone && (
+                    <p className="text-sm">Phone: {vendorData.phone}</p>
+                  )}
+                  {vendorData.website && (
+                    <p className="text-sm">Website: {vendorData.website}</p>
+                  )}
+                </div>
+              )}
+            </motion.div>
+
+            {/* Goods Sold */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="md:col-span-2 bg-card rounded-lg border border-border p-6"
+            >
+              <div className="flex items-center gap-2 mb-6">
+                <Package className="h-5 w-5 text-primary" />
+                <h2 className="text-xl font-semibold">Goods You Sell</h2>
+              </div>
+
+              <div className="space-y-4">
+                {/* Add new item */}
+                <div className="flex gap-2">
+                  <Input
+                    value={newItem}
+                    onChange={(e) => setNewItem(e.target.value)}
+                    placeholder="Add new item..."
+                    onKeyDown={(e) => e.key === "Enter" && handleAddItem()}
+                  />
+                  <Button onClick={handleAddItem}>
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Items list */}
+                <div className="grid gap-2">
+                  {vendorData?.goodsSold.map((item) => (
+                    <motion.div
+                      key={item}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="flex items-center justify-between p-3 bg-background rounded-md border border-border"
+                    >
+                      <span>{item}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveItem(item)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </main>
       </div>
-    </div>
+    </PageTransition>
   );
 }
