@@ -1,15 +1,13 @@
 "use client";
-import { useCallback, useState, useEffect, Fragment } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Listbox, Transition } from "@headlessui/react";
-import { ChevronDown, Menu, X } from "lucide-react";
+import {  Menu, X } from "lucide-react";
 import MarketCard from "./components/MarketCard";
 import { MarketSearch } from "./components/MarketSearch";
 import { useRouter } from "next/navigation";
 import { SuggestMarketModal } from "./components/MarketSuggestModal";
 import { useMarkets } from "./hooks/useMarkets";
 import { Market } from "@/types/market";
-import moment from "moment";
 import { PageTransition } from "./components/PageTransition";
 import { UserMenu } from "./components/UserMenu";
 import { LoadingGrid } from "./components/LoadingGrid";
@@ -48,59 +46,11 @@ type MarketData = {
   nextDate: string;
 };
 
-type FilterOption = {
-  id: string;
-  name: string;
-  value: string;
-};
-
-const sortOptions: FilterOption[] = [
-  { id: "1", name: "Newest First", value: "newest" },
-  { id: "2", name: "Oldest First", value: "oldest" },
-  { id: "3", name: "A-Z", value: "alphabetical" },
-  { id: "4", name: "Location", value: "location" }
-];
-
 export function Home() {
   const { data: markets, isLoading } = useMarkets();
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [selectedSort, setSelectedSort] = useState(sortOptions[0]);
-  const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([]);
   const router = useRouter();
-
-  // Debounced sort function
-  const sortMarkets = useCallback(
-    (option: FilterOption) => {
-      let sorted = Array.isArray(markets) ? [...markets] : [];
-      switch (option.value) {
-        case "newest":
-          sorted = sorted.sort(
-            (a, b) =>
-              moment(b.createdAt).valueOf() - moment(a.createdAt).valueOf()
-          );
-          break;
-        case "oldest":
-          sorted = sorted.sort(
-            (a, b) =>
-              moment(a.createdAt).valueOf() - moment(b.createdAt).valueOf()
-          );
-          break;
-        case "alphabetical":
-          sorted = sorted.sort((a, b) => a.name.localeCompare(b.name));
-          break;
-        case "location":
-          sorted = sorted.sort((a, b) => a.location.localeCompare(b.location));
-          break;
-      }
-      setFilteredMarkets(sorted);
-    },
-    [markets]
-  );
-
-  useEffect(() => {
-    sortMarkets(selectedSort);
-  }, [selectedSort, sortMarkets]);
 
   const handleMarketSelect = (market: Market) => {
     router.push(`/markets/${market.id}`);
@@ -246,56 +196,6 @@ export function Home() {
             >
               Featured Markets
             </motion.h2>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="relative w-full sm:w-64"
-            >
-              <Listbox value={selectedSort} onChange={setSelectedSort}>
-                <div className="relative mt-1">
-                  <Listbox.Button className="relative w-full cursor-pointer rounded-lg bg-card py-2 pl-3 pr-10 text-left shadow-sm border border-border focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:text-sm">
-                    <span className="block truncate">{selectedSort.name}</span>
-                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                      <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                    </span>
-                  </Listbox.Button>
-                  <Transition
-                    as={Fragment}
-                    leave="transition ease-in duration-100"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                  >
-                    <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-card py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-10">
-                      {sortOptions.map((option) => (
-                        <Listbox.Option
-                          key={option.id}
-                          className={({ active }) =>
-                            `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
-                              active
-                                ? "bg-primary/10 text-primary"
-                                : "text-foreground"
-                            }`
-                          }
-                          value={option}
-                        >
-                          {({ selected }) => (
-                            <>
-                              <span
-                                className={`block truncate ${
-                                  selected ? "font-medium" : "font-normal"
-                                }`}
-                              >
-                                {option.name}
-                              </span>
-                            </>
-                          )}
-                        </Listbox.Option>
-                      ))}
-                    </Listbox.Options>
-                  </Transition>
-                </div>
-              </Listbox>
-            </motion.div>
           </div>
 
           {/* Markets Grid */}
@@ -308,7 +208,7 @@ export function Home() {
             {isLoading ? (
               <LoadingGrid />
             ) : (
-              filteredMarkets.map((market) => (
+              markets?.map((market) => (
                 <motion.div
                   key={market.id}
                   variants={itemVariants}

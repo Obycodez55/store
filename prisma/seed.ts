@@ -31,8 +31,9 @@ function readMarketData() {
   return data.map((row: any) => ({
     name: row['Market Name'],
     location: row['Location'] || 'Location not specified',
-    prevDate: new Date(),
-    nextDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    description: row['Description'] || 'Description not specified',
+    prevDate: new Date(row['Previous Market Day'] || Date.now()),
+    nextDate: new Date(row['Next Market Day'] || Date.now() + 7 * 24 * 60 * 60 * 1000)
   }));
 }
 
@@ -50,7 +51,7 @@ async function seed() {
       const market = await prisma.market.create({
         data: {
           name: marketInfo.name,
-          description: faker.lorem.sentence(),
+          description: marketInfo.description,
           image: faker.helpers.arrayElement(marketImages),
           location: marketInfo.location,
           prevDate: marketInfo.prevDate,
