@@ -1,6 +1,7 @@
 import React from "react";
 import { MapPin } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 type Props = {
   id: string;
@@ -19,11 +20,12 @@ const MarketCard = (props: Props) => {
           className="relative w-full pt-[66.67%] overflow-hidden"
         >
           <div className="absolute inset-0 bg-black/5 group-hover:bg-black/20 transition-colors duration-200" />
-          <img
+          <Image
             src={props.image}
             alt={props.name}
+            width={400}
+            height={300}
             className="absolute inset-0 w-full h-full object-cover transform hover:scale-110 transition-transform duration-300"
-            loading="lazy"
           />
           {/* Gradient overlay for better text visibility */}
           <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />

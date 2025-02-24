@@ -30,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import Image from "next/image";
 
 // Form validation schema
 const loginSchema = z.object({
@@ -172,10 +173,11 @@ const Auth = () => {
         transition={{ duration: 0.6 }}
       >
         <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1488459716781-31db52582fe9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80"
+          <Image
+            src="https://images.unsplash.com/photo-1488459716781-31db52582fe9"
             alt="Local market with fresh produce"
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-br from-primary-950/90 via-primary-900/90 to-primary-800/90 dark:from-primary-950/95 dark:via-primary-950/90 dark:to-primary-900/90" />

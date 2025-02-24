@@ -1,5 +1,4 @@
 import { signIn } from "next-auth/react";
-import axios, { AxiosError } from 'axios';
 
 
 export async function login({ email, password }: { email: string; password: string }) {

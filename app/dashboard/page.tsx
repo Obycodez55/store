@@ -35,8 +35,11 @@ export default function DashboardPage() {
           `/api/products?userId=${session?.user?.id}`
         );
         setProducts(response.data);
-      } catch (error) {
-        toast.error("Failed to fetch products");
+      } catch (err) {
+        toast.error(
+          "Failed to fetch products: " +
+            (err instanceof Error ? err.message : "Unknown error")
+        );
       }
     };
 
@@ -105,6 +108,7 @@ export default function DashboardPage() {
       setEditingProduct(null);
       reset();
     } catch (error) {
+      console.log(error);
       toast.error(
         editingProduct ? "Failed to update product" : "Failed to create product"
       );
@@ -126,6 +130,7 @@ export default function DashboardPage() {
         setProducts(products.filter((p) => p.id !== productId));
         toast.success("Product deleted successfully");
       } catch (error) {
+        console.log(error);
         toast.error("Failed to delete product");
       }
     }

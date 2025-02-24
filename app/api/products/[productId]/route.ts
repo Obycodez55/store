@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
@@ -12,8 +12,8 @@ cloudinary.config({
 
 // PUT /api/products/[productId] - Update a product
 export async function PUT(
-    req: Request,
-    { params }: { params: { productId: string } }  // Changed from id to productId
+    request: NextRequest,
+    { params }: any
 ) {
     try {
         const session = await getServerSession(authOptions);
@@ -21,7 +21,7 @@ export async function PUT(
             return new NextResponse('Unauthorized', { status: 401 });
         }
 
-        const formData = await req.formData();
+        const formData = await request.formData();
 
         // Check if product exists and belongs to the vendor
         const existingProduct = await prisma.product.findFirst({
@@ -72,8 +72,8 @@ export async function PUT(
 
 // DELETE /api/products/[productId] - Delete a product
 export async function DELETE(
-    req: Request,
-    { params }: { params: { productId: string } }  // Changed from id to productId
+    request: NextRequest,
+    { params }: any
 ) {
     try {
         const session = await getServerSession(authOptions);

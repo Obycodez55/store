@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Tag, Store } from "lucide-react";
 import { ProductDetailsModal } from "./ProductDetailsModal";
+import Image from "next/image";
 
 type Props = {
   id: string;
@@ -36,9 +37,11 @@ const ProductCard = (props: Props) => {
       >
         <div className="flex flex-col h-full bg-card rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
           <div className="relative h-48">
-            <img
+            <Image
               src={props.image || "/placeholder.png"}
               alt={props.name}
+              width={300}
+              height={300}
               className="w-full h-full object-cover object-center"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -83,7 +86,7 @@ const ProductCard = (props: Props) => {
       <ProductDetailsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        product={{...props, tags: props.category}}
+        product={{ ...props, tags: props.category }}
       />
     </>
   );

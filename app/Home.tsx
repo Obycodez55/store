@@ -7,7 +7,6 @@ import MarketCard from "./components/MarketCard";
 import { MarketSearch } from "./components/MarketSearch";
 import { useRouter } from "next/navigation";
 import { SuggestMarketModal } from "./components/MarketSuggestModal";
-import debounce from "lodash/debounce";
 import { useMarkets } from "./hooks/useMarkets";
 import { Market } from "@/types/market";
 import moment from "moment";
@@ -72,7 +71,7 @@ export function Home() {
 
   // Debounced sort function
   const sortMarkets = useCallback(
-    debounce((option: FilterOption) => {
+    (option: FilterOption) => {
       let sorted = Array.isArray(markets) ? [...markets] : [];
       switch (option.value) {
         case "newest":
@@ -95,7 +94,7 @@ export function Home() {
           break;
       }
       setFilteredMarkets(sorted);
-    }, 300),
+    },
     [markets]
   );
 

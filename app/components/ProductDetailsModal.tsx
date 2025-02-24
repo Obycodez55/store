@@ -5,6 +5,7 @@ import { Dialog } from "@headlessui/react";
 import { Button } from "@/components/ui/button";
 import { X, Copy, MapPin, Phone, Mail, Globe, Store } from "lucide-react";
 import { toast } from "sonner";
+import Image from 'next/image';
 
 export interface ModalProduct{
   name: string;
@@ -105,9 +106,11 @@ export const ProductDetailsModal = ({
 
                 {/* Product image */}
                 <div className="relative h-48 md:h-64 w-full">
-                  <img
-                    src={product.image}
+                  <Image 
+                    src={product.image} 
                     alt={product.name}
+                    width={400}
+                    height={400}
                     className="w-full h-full object-cover rounded-t-lg"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

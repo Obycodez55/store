@@ -9,6 +9,7 @@ import { useProductSearch } from "@/app/hooks/useProductSearch";
 import { Product } from "@/types/market";
 import debounce from "lodash/debounce";
 import { useOnClickOutside } from "../hooks/useOnClickOutside";
+import Image from "next/image";
 
 interface ProductSearchProps {
   onProductSelect: (product: Product) => void;
@@ -25,13 +26,15 @@ export const ProductSearch = ({
   const { data, isLoading } = useProductSearch(query);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  useOnClickOutside(searchRef as React.RefObject<HTMLElement>, () => setIsOpen(false));
+  useOnClickOutside(searchRef as React.RefObject<HTMLElement>, () =>
+    setIsOpen(false)
+  );
 
   const debouncedSearch = useCallback(
     debounce((value: string) => {
       setQuery(value);
     }, 300),
-    []
+    [setQuery]
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,9 +103,11 @@ export const ProductSearch = ({
                   >
                     <div className="flex items-center gap-3">
                       {product.image && (
-                        <img
+                        <Image
                           src={product.image}
                           alt={product.name}
+                          width={100}
+                          height={100}
                           className="w-12 h-12 rounded-md object-cover bg-muted"
                         />
                       )}
