@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -20,12 +14,13 @@ model User {
   emailVerified DateTime?
   password      String
   image         String?
+  phone         String?  @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  vendorId      String?   @unique
   accounts      Account[]
   sessions      Session[]
   vendor        Vendor?   @relation(fields: [vendorId], references: [id])
-  vendorId      String?   @unique
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
 }
 
 model Account {
@@ -41,8 +36,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -71,19 +65,19 @@ model Market {
   location    String
   prevDate    DateTime
   nextDate    DateTime
-  vendors     Vendor[]
-  images      MarketImages[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
+  images      MarketImages[]
+  vendors     Vendor[]
 }
 
 model MarketImages {
   id        String   @id @default(cuid())
   url       String
-  market    Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
   marketId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  market    Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
 }
 
 model MarketSuggestions {
@@ -97,16 +91,16 @@ model MarketSuggestions {
 model Vendor {
   id        String    @id @default(cuid())
   name      String
+  marketId  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   email     String?
   phone     String?
   website   String?
-  marketId  String
-  market    Market    @relation(fields: [marketId], references: [id])
+  goodsSold String[]
   products  Product[]
   user      User?
-  goodsSold String[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  market    Market    @relation(fields: [marketId], references: [id])
 }
 
 model Product {
@@ -117,9 +111,9 @@ model Product {
   price       Float
   vendorId    String
   tags        Tags[]
-  vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
 }
 
 enum Tags {
