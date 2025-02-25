@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 import { MarketSelect } from "./MarketSelect";
 
 export function SignUpForm() {
@@ -15,7 +16,8 @@ export function SignUpForm() {
     phone: "",
     password: "",
     marketId: "",
-    website: ""
+    website: "",
+    email: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,8 +28,9 @@ export function SignUpForm() {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
+      console.log({ response });
 
       const data = await response.json();
 
@@ -39,7 +42,7 @@ export function SignUpForm() {
       const signInResult = await signIn("credentials", {
         phone: formData.phone,
         password: formData.password,
-        redirect: false
+        redirect: false,
       });
 
       if (signInResult?.error) {

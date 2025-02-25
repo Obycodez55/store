@@ -21,14 +21,14 @@ import {
   EyeOff,
   User,
   Phone,
-  Globe
+  Globe,
 } from "lucide-react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 import Image from "next/image";
 
@@ -40,7 +40,7 @@ const loginSchema = z.object({
     .min(8, "Password must be at least 8 characters")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[0-9]/, "Password must contain at least one number"),
 });
 
 const registerSchema = loginSchema
@@ -49,11 +49,11 @@ const registerSchema = loginSchema
     name: z.string().min(2, "Name must be at least 2 characters"),
     marketId: z.string().min(1, "Please select a market"),
     website: z.string().url("Please enter a valid website URL").optional(),
-    phone: z.string().min(10, "Please enter a valid phone number").optional()
+    phone: z.string().min(10, "Please enter a valid phone number").optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword"]
+    path: ["confirmPassword"],
   });
 
 type AuthFormValues = z.infer<typeof registerSchema>;
@@ -62,7 +62,7 @@ type AuthFormValues = z.infer<typeof registerSchema>;
 const pageVariants = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 }
+  exit: { opacity: 0, y: -20 },
 };
 
 const formVariants = {
@@ -72,9 +72,9 @@ const formVariants = {
     x: 0,
     transition: {
       type: "spring",
-      bounce: 0.4
-    }
-  }
+      bounce: 0.4,
+    },
+  },
 };
 
 const Auth = () => {
@@ -93,8 +93,8 @@ const Auth = () => {
       name: "",
       marketId: "",
       phone: "",
-      website: ""
-    }
+      website: "",
+    },
   });
 
   // When switching between login/register, reset the form
@@ -110,7 +110,7 @@ const Auth = () => {
       setMarkets(
         data.map((market: any) => ({
           id: market.id,
-          name: market.name
+          name: market.name,
         }))
       );
     };
@@ -127,10 +127,10 @@ const Auth = () => {
         if (isLogin) {
           await login({
             email: data.email,
-            password: data.password
+            password: data.password,
           });
           toast.success("Welcome back!", {
-            description: "You've successfully signed in."
+            description: "You've successfully signed in.",
           });
           router.push("/dashboard");
         } else {
@@ -140,21 +140,21 @@ const Auth = () => {
             name: data.name,
             marketId: data.marketId,
             phone: data.phone,
-            website: data.website
+            website: data.website,
           });
           toast.success("Account created!", {
-            description: "Your account has been successfully created."
+            description: "Your account has been successfully created.",
           });
           await login({
             email: data.email,
-            password: data.password
+            password: data.password,
           });
           router.push("/dashboard");
         }
       } catch (error: any) {
         toast.error("Authentication failed", {
           description:
-            error.message || "Please check your credentials and try again."
+            error.message || "Please check your credentials and try again.",
         });
       } finally {
         setIsLoading(false);
@@ -164,10 +164,10 @@ const Auth = () => {
   );
 
   return (
-    <div className="min-h-screen w-full grid lg:grid-cols-2">
+    <div className="grid lg:grid-cols-2 w-full min-h-screen">
       {/* Left side - Image with animated overlay */}
       <motion.div
-        className="hidden lg:block relative overflow-hidden"
+        className="lg:block relative hidden overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6 }}
@@ -180,7 +180,7 @@ const Auth = () => {
             className="object-cover"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-950/90 via-primary-900/90 to-primary-800/90 dark:from-primary-950/95 dark:via-primary-950/90 dark:to-primary-900/90" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-950/90 dark:from-primary-950/95 via-primary-900/90 dark:via-primary-950/90 to-primary-800/90 dark:to-primary-900/90" />
         <div className="absolute inset-0">
           {/* Decorative pattern overlay */}
           <div className="absolute inset-0 bg-[url('/grid.svg')] bg-repeat [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
@@ -193,10 +193,10 @@ const Auth = () => {
             className="space-y-6"
           >
             <div className="space-y-2">
-              <h1 className="text-3xl md:text-4xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
+              <h1 className="bg-clip-text bg-gradient-to-r from-white to-white/70 font-bold font-display text-3xl text-transparent md:text-4xl">
                 Welcome to MarketPlace
               </h1>
-              <p className="text-lg text-white/60 max-w-md leading-relaxed">
+              <p className="max-w-md text-lg text-white/60 leading-relaxed">
                 Connect with local markets, discover fresh produce, and support
                 your community.
               </p>
@@ -213,7 +213,7 @@ const Auth = () => {
                 "Discover local markets near you",
                 "Connect with trusted vendors",
                 "Access fresh, quality products",
-                "Support your local community"
+                "Support your local community",
               ].map((feature, index) => (
                 <motion.li
                   key={feature}
@@ -222,7 +222,7 @@ const Auth = () => {
                   transition={{ delay: 0.8 + index * 0.1 }}
                   className="flex items-center gap-2"
                 >
-                  <div className="h-1.5 w-1.5 rounded-full bg-primary-300" />
+                  <div className="bg-primary-300 rounded-full w-1.5 h-1.5" />
                   {feature}
                 </motion.li>
               ))}
@@ -232,7 +232,7 @@ const Auth = () => {
       </motion.div>
 
       {/* Right side - Auth form */}
-      <div className="flex items-center justify-center p-6 bg-background">
+      <div className="flex justify-center items-center bg-background p-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={isLogin ? "login" : "register"}
@@ -240,13 +240,13 @@ const Auth = () => {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="w-full max-w-md space-y-6"
+            className="space-y-6 w-full max-w-md"
           >
             <motion.div
               variants={formVariants}
-              className="text-center space-y-2"
+              className="space-y-2 text-center"
             >
-              <h2 className="text-2xl font-display font-bold text-foreground">
+              <h2 className="font-bold font-display text-2xl text-foreground">
                 {isLogin ? "Welcome back" : "Create an account"}
               </h2>
               <p className="text-muted-foreground">
@@ -273,10 +273,10 @@ const Auth = () => {
                         disabled={isLoading}
                         className="pl-10"
                       />
-                      <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                      <Mail className="top-2.5 left-3 absolute w-5 h-5 text-muted-foreground" />
                     </div>
                     {form.formState.errors.email && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-destructive text-sm">
                         {form.formState.errors.email.message}
                       </p>
                     )}
@@ -294,10 +294,10 @@ const Auth = () => {
                             disabled={isLoading}
                             className="pl-10"
                           />
-                          <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <User className="top-2.5 left-3 absolute w-5 h-5 text-muted-foreground" />
                         </div>
                         {form.formState.errors.name && (
-                          <p className="text-sm text-destructive">
+                          <p className="text-destructive text-sm">
                             {form.formState.errors.name.message}
                           </p>
                         )}
@@ -322,7 +322,7 @@ const Auth = () => {
                           </SelectContent>
                         </Select>
                         {form.formState.errors.marketId && (
-                          <p className="text-sm text-destructive">
+                          <p className="text-destructive text-sm">
                             {form.formState.errors.marketId.message}
                           </p>
                         )}
@@ -339,10 +339,10 @@ const Auth = () => {
                             disabled={isLoading}
                             className="pl-10"
                           />
-                          <Phone className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <Phone className="top-2.5 left-3 absolute w-5 h-5 text-muted-foreground" />
                         </div>
                         {form.formState.errors.phone && (
-                          <p className="text-sm text-destructive">
+                          <p className="text-destructive text-sm">
                             {form.formState.errors.phone.message}
                           </p>
                         )}
@@ -359,10 +359,10 @@ const Auth = () => {
                             disabled={isLoading}
                             className="pl-10"
                           />
-                          <Globe className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                          <Globe className="top-2.5 left-3 absolute w-5 h-5 text-muted-foreground" />
                         </div>
                         {form.formState.errors.website && (
-                          <p className="text-sm text-destructive">
+                          <p className="text-destructive text-sm">
                             {form.formState.errors.website.message}
                           </p>
                         )}
@@ -379,23 +379,23 @@ const Auth = () => {
                         placeholder="Enter your password"
                         {...form.register("password")}
                         disabled={isLoading}
-                        className="pl-10 pr-10"
+                        className="pr-10 pl-10"
                       />
-                      <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                      <Lock className="top-2.5 left-3 absolute w-5 h-5 text-muted-foreground" />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
+                        className="top-2.5 right-3 absolute text-muted-foreground hover:text-foreground"
                       >
                         {showPassword ? (
-                          <EyeOff className="h-5 w-5" />
+                          <EyeOff className="w-5 h-5" />
                         ) : (
-                          <Eye className="h-5 w-5" />
+                          <Eye className="w-5 h-5" />
                         )}
                       </button>
                     </div>
                     {form.formState.errors.password && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-destructive text-sm">
                         {form.formState.errors.password.message}
                       </p>
                     )}
@@ -413,10 +413,10 @@ const Auth = () => {
                           disabled={isLoading}
                           className="pl-10"
                         />
-                        <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                        <Lock className="top-2.5 left-3 absolute w-5 h-5 text-muted-foreground" />
                       </div>
                       {form.formState.errors.confirmPassword && (
-                        <p className="text-sm text-destructive">
+                        <p className="text-destructive text-sm">
                           {form.formState.errors.confirmPassword.message}
                         </p>
                       )}
@@ -425,7 +425,7 @@ const Auth = () => {
 
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading && (
-                      <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                      <Icons.spinner className="mr-2 w-4 h-4 animate-spin" />
                     )}
                     {isLoading
                       ? "Processing..."
@@ -437,7 +437,7 @@ const Auth = () => {
               </CardContent>
 
               <CardFooter className="flex flex-col gap-4 text-center">
-                <div className="text-sm text-muted-foreground">
+                <div className="text-muted-foreground text-sm">
                   {isLogin
                     ? "Don't have an account?"
                     : "Already have an account?"}{" "}
@@ -457,7 +457,7 @@ const Auth = () => {
                   className="text-muted-foreground hover:text-foreground"
                   onClick={() => router.push("/")}
                 >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  <ArrowLeft className="mr-2 w-4 h-4" />
                   Back to home
                 </Button>
               </CardFooter>

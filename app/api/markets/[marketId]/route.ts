@@ -16,8 +16,8 @@ export async function GET(
       );
     }
 
-    const market = await prisma.market.findUnique({
-      where: { id: marketId.toString() }, // Ensure it's correctly formatted
+    const market = await prisma.market.findFirst({
+      where: { id: marketId }, // Ensure it's correctly formatted
       include: {
         images: true,
         vendors: {
@@ -27,15 +27,10 @@ export async function GET(
         },
       },
     });
-
     if (!market) {
-      return NextResponse.json(
-        { error: "Market not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Market not found" }, { status: 404 });
     }
-
-    return NextResponse.json(market);
+    return NextResponse.json(JSON.stringify(market));
   } catch (error) {
     console.error("Error fetching market:", error);
     return NextResponse.json(

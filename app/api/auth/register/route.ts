@@ -1,27 +1,31 @@
-import { NextRequest, NextResponse } from "next/server"
-import prisma from "@/lib/prisma"
-import bcrypt from "bcryptjs"
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { phone, password, name, marketId, website } = body
+    const body = await request.json();
+    console.log({ body });
+    const { phone, password, name, marketId, website } = body;
 
     // Validate input
     if (!phone || !password || !marketId) {
       return NextResponse.json(
         { message: "Phone, password and market ID are required" },
         { status: 400 }
-      )
+      );
     }
 
     // Phone number validation (international format)
-    const phoneRegex = /^\+[1-9]\d{1,14}$/
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
     if (!phoneRegex.test(phone)) {
       return NextResponse.json(
-        { message: "Invalid phone number format. Please use international format (e.g., +1234567890)" },
+        {
+          message:
+            "Invalid phone number format. Please use international format (e.g., +1234567890)",
+        },
         { status: 400 }
-      )
+      );
     }
 
     // Password strength validation
@@ -29,42 +33,45 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { message: "Password must be at least 8 characters long" },
         { status: 400 }
-      )
+      );
     }
-
+    console.log("Body:", body);
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { phone }
-    })
+    const existingUser = await prisma.user.findFirst({
+      where: { vendor: { phone } },
+    });
 
     if (existingUser) {
       return NextResponse.json(
         { message: "User with this phone number already exists" },
         { status: 400 }
-      )
+      );
     }
+    console.log("Market ID:", marketId);
 
     // Verify market exists
     const market = await prisma.market.findUnique({
-      where: { id: marketId }
-    })
+      where: { id: marketId },
+    });
 
+    console.log("Market:", market);
     if (!market) {
       return NextResponse.json(
         { message: "Market not found" },
         { status: 404 }
-      )
+      );
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10)
-
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("Hashed password", hashedPassword);
     // Create user with vendor relationship
+    console.log("Database URL:", process.env.DATABASE_URL);
     const user = await prisma.user.create({
       data: {
-        phone,
         password: hashedPassword,
         name,
+        email: body.email,
         vendor: {
           create: {
             name,
@@ -72,24 +79,27 @@ export async function POST(request: NextRequest) {
             website,
             market: {
               connect: {
-                id: marketId
-              }
-            }
-          }
-        }
-      }
-    })
+                id: marketId,
+              },
+            },
+          },
+        },
+      },
+      include: {
+        vendor: true,
+      },
+    });
 
     return NextResponse.json({
       id: user.id,
-      phone: user.phone,
-      name: user.name
-    })
+      phone: user.vendor?.phone,
+      name: user.name,
+    });
   } catch (error) {
-    console.error("Registration error:", error)
+    console.error("Registration error:", JSON.stringify(error));
     return NextResponse.json(
       { message: "Something went wrong" },
       { status: 500 }
-    )
+    );
   }
 }

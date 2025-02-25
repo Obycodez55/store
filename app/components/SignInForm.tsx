@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Phone } from "lucide-react";
 
 export function SignInForm() {
   const router = useRouter();
@@ -22,7 +21,7 @@ export function SignInForm() {
       const result = await signIn("credentials", {
         phone,
         password,
-        redirect: false
+        redirect: false,
       });
 
       if (result?.error) {
