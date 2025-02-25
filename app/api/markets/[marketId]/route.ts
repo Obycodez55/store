@@ -1,13 +1,15 @@
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  req: Request,
-  { params }: any
+  request: NextRequest,
+  { params }: any // Correct way to extract params
 ) {
   try {
+    const context = await params;
+    const marketId = context.marketId;
     // Ensure marketId is valid
-    if (!params.marketId) {
+    if (!marketId) {
       return NextResponse.json(
         { error: "Market ID is required" },
         { status: 400 }
@@ -15,7 +17,7 @@ export async function GET(
     }
 
     const market = await prisma.market.findUnique({
-      where: { id: params.marketId },
+      where: { id: marketId.toString() }, // Ensure it's correctly formatted
       include: {
         images: true,
         vendors: {
@@ -33,7 +35,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(market, { status: 200 });
+    return NextResponse.json(market);
   } catch (error) {
     console.error("Error fetching market:", error);
     return NextResponse.json(

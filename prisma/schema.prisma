@@ -22,8 +22,8 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
-  vendor        Vendor    @relation(fields: [vendorId], references: [id])
-  vendorId      String    @unique
+  vendor        Vendor?   @relation(fields: [vendorId], references: [id])
+  vendorId      String?   @unique
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }

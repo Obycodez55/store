@@ -5,21 +5,21 @@ import bcrypt from "bcryptjs"
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, password, name, marketId, website, phone } = body
+    const { phone, password, name, marketId, website } = body
 
     // Validate input
-    if (!email || !password || !marketId) {
+    if (!phone || !password || !marketId) {
       return NextResponse.json(
-        { message: "Email, password and market ID are required" },
+        { message: "Phone, password and market ID are required" },
         { status: 400 }
       )
     }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
+    // Phone number validation (international format)
+    const phoneRegex = /^\+[1-9]\d{1,14}$/
+    if (!phoneRegex.test(phone)) {
       return NextResponse.json(
-        { message: "Invalid email format" },
+        { message: "Invalid phone number format. Please use international format (e.g., +1234567890)" },
         { status: 400 }
       )
     }
@@ -34,12 +34,12 @@ export async function POST(request: NextRequest) {
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email }
+      where: { phone }
     })
 
     if (existingUser) {
       return NextResponse.json(
-        { message: "User with this email already exists" },
+        { message: "User with this phone number already exists" },
         { status: 400 }
       )
     }
@@ -62,15 +62,14 @@ export async function POST(request: NextRequest) {
     // Create user with vendor relationship
     const user = await prisma.user.create({
       data: {
-        email,
+        phone,
         password: hashedPassword,
         name,
         vendor: {
           create: {
             name,
-            email,
-            website,
             phone,
+            website,
             market: {
               connect: {
                 id: marketId
@@ -83,12 +82,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       id: user.id,
-      email: user.email
-    }, { status: 201 })
+      phone: user.phone,
+      name: user.name
+    })
   } catch (error) {
-    console.error(error)
+    console.error("Registration error:", error)
     return NextResponse.json(
-      { message: "Internal server error" },
+      { message: "Something went wrong" },
       { status: 500 }
     )
   }

@@ -2,6 +2,7 @@ import { PrismaClient, Tags } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import * as XLSX from 'xlsx';
 import { join } from 'path';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -43,6 +44,7 @@ async function seed() {
   await prisma.market.deleteMany();
   await prisma.vendor.deleteMany();
   await prisma.product.deleteMany();
+  await prisma.user.deleteMany();
 
   const marketData = readMarketData();
 
@@ -60,23 +62,37 @@ async function seed() {
             create: marketImages.map((url) => ({ url })),
           },
           vendors: {
-            create: Array.from({ length: 3 }, () => ({
-              name: faker.company.name(),
-              email: faker.internet.email(),
-              phone: faker.phone.number(),
-              website: faker.internet.url(),
-              products: {
-                create: Array.from({ length: 5 }, () => ({
-                  name: faker.commerce.productName(),
-                  description: faker.commerce.productDescription(),
-                  image: faker.helpers.arrayElement(productImages),
-                  price: parseFloat(faker.commerce.price({ min: 5, max: 50 })),
-                  tags: [faker.helpers.arrayElement(Object.values(Tags))],
-                })),
-              },
-            })),
-          },
-        },
+            create: await Promise.all(Array.from({ length: 3 }, async () => {
+              // Create a user first
+              const hashedPassword = await bcrypt.hash('password123', 10);
+              const email = faker.internet.email();
+
+              return {
+                name: faker.company.name(),
+                email,
+                phone: faker.phone.number(),
+                website: faker.internet.url(),
+                goodsSold: Array.from({ length: 3 }, () => faker.commerce.product()),
+                products: {
+                  create: Array.from({ length: 5 }, () => ({
+                    name: faker.commerce.productName(),
+                    description: faker.commerce.productDescription(),
+                    image: faker.helpers.arrayElement(productImages),
+                    price: parseFloat(faker.commerce.price({ min: 5, max: 50 })),
+                    tags: [faker.helpers.arrayElement(Object.values(Tags))]
+                  }))
+                },
+                user: {
+                  create: {
+                    email,
+                    password: hashedPassword,
+                    name: faker.person.fullName()
+                  }
+                }
+              };
+            }))
+          }
+        }
       });
 
       console.log(`✅ Created market: ${market.name}`);

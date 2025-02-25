@@ -13,6 +13,7 @@ import { PageTransition } from "@/app/components/PageTransition";
 import { UserMenu } from "@/app/components/UserMenu";
 import ProductCardSkeleton from "@/app/components/ProductCardSkeleton";
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 
 // Animation variants
 const containerVariants = {
@@ -40,9 +41,14 @@ const itemVariants = {
 
 const Market = () => {
   const { marketId } = useParams();
-  const { data: market, isLoading: marketLoading } = useMarkets(
-    marketId as string
-  );
+  const { data: market, isLoading: marketLoading } = useQuery({
+    queryKey: ["market", marketId],
+    queryFn: async () => {
+      const response = await fetch(`/api/markets/${marketId}`);
+      if (!response.ok) throw new Error("Failed to fetch market");
+      return response.json();
+    }
+  });
   const { data: products, isLoading: productsLoading } = useProducts();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -103,9 +109,25 @@ const Market = () => {
 
   if (marketLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
+      <PageTransition>
+        <div className="min-h-screen bg-background">
+          <div className="animate-pulse space-y-8">
+            <div className="h-96 bg-muted" />
+            <div className="container mx-auto px-4 space-y-8">
+              <div className="h-8 bg-muted w-1/3 rounded" />
+              <div className="space-y-4">
+                <div className="h-4 bg-muted w-1/4 rounded" />
+                <div className="h-4 bg-muted w-1/2 rounded" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </PageTransition>
     );
   }
 

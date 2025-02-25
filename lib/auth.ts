@@ -11,37 +11,36 @@ export const authOptions: AuthOptions = {
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: "Email", type: "email" },
+        phone: { label: "Phone", type: "tel", placeholder: "+1234567890" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials.password) {
-          return null
+        if (!credentials?.phone || !credentials?.password) {
+          throw new Error("Missing credentials")
         }
 
-        // Find user by email
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
+          where: { phone: credentials.phone }
         })
 
         if (!user) {
-          return null
+          throw new Error("Invalid phone number or password")
         }
 
-        // Check password
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
           user.password
         )
 
         if (!isPasswordValid) {
-          return null
+          throw new Error("Invalid phone number or password")
         }
 
         return {
           id: user.id,
-          email: user.email,
-          name: user.name
+          name: user.name,
+          phone: user.phone,
+          image: user.image
         }
       }
     })
@@ -50,13 +49,21 @@ export const authOptions: AuthOptions = {
     strategy: 'jwt' as SessionStrategy
   },
   callbacks: {
-    async session({ session, token }: { session: any, token: any }) {
-      session.user.id = token.sub
+    async jwt({ token, user }) {
+      if (user) {
+        token.phone = user.phone
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.phone = token.phone
+      }
       return session
     }
   },
   pages: {
-    signIn: '/auth/signin'
+    signIn: '/auth'
   },
   debug: true,
   logger: {
