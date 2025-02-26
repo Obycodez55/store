@@ -54,6 +54,7 @@ export default function Dashboard() {
       setNewItem("");
       refetch();
     } catch (error) {
+      console.log(error)
       toast.error("Failed to add item");
     }
   };
@@ -71,6 +72,7 @@ export default function Dashboard() {
       toast.success("Item removed successfully");
       refetch();
     } catch (error) {
+      console.log(error)
       toast.error("Failed to remove item");
     }
   };

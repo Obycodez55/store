@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import MarketCard from "./components/MarketCard";
@@ -208,7 +208,7 @@ export default function Home() {
             {marketsIsLoading ? (
               <LoadingGrid />
             ) : (
-              markets?.map((market) => (
+              markets?.map((market: any) => (
                 <motion.div
                   key={market.id}
                   variants={itemVariants}

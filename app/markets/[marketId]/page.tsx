@@ -129,8 +129,8 @@ const Market = () => {
   const subscribeToMarketDays = useCallback(() => {
     if (!market) return;
     subscribe({
-      prevDate: marketDays.lastMarketDay?.toISOString() || "",
-      nextDate: marketDays.nextMarketDay?.toISOString() || "",
+      prevDate: marketDays.lastMarketDay?.toString() || "",
+      nextDate: marketDays.nextMarketDay?.toString() || "",
       summary: `${market.name} Market Event`,
       description: market.description || "No description available",
     });
@@ -336,7 +336,7 @@ const Market = () => {
                   animate="show"
                   className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
                 >
-                  {marketProducts.map((product) => (
+                  {marketProducts.map((product: any) => (
                     <motion.div
                       key={product.id}
                       variants={itemVariants}

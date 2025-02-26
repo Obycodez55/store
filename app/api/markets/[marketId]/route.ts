@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { marketId: string } }
+  { params }: any
 ) {
   try {
     const marketId = params.marketId;

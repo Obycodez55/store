@@ -32,6 +32,7 @@ export function SignInForm() {
       router.push("/dashboard");
       toast.success("Signed in successfully");
     } catch (error) {
+      console.log(error)
       toast.error("Something went wrong");
     } finally {
       setIsLoading(false);

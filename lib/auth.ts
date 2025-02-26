@@ -4,6 +4,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "./prisma";
 import bcrypt from "bcryptjs";
 import { AuthOptions } from "next-auth";
+import { User } from "@prisma/client";
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -53,7 +54,7 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.phone = user.phone;
+        token.phone = (user as User & { phone: string }).phone;
       }
       return token;
     },

@@ -10,8 +10,8 @@ export async function GET() {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const vendor = await prisma.vendor.findUnique({
-      where: { userId: session.user.id },
+    const vendor = await prisma.vendor.findFirst({
+      where: { user: {id: session.user.id} },
       include: {
         market: {
           select: {

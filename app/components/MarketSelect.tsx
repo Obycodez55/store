@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -15,7 +15,7 @@ type MarketSelectProps = {
 };
 
 export function MarketSelect({ value, onChange }: MarketSelectProps) {
-  const [markets, setMarkets] = useState<{ id: string; name: string }[]>([
+  const [markets] = useState<{ id: string; name: string }[]>([
     { id: "1", name: "Farmers Market" },
     { id: "2", name: "Grocery Store" },
     { id: "3", name: "Online Marketplace" },
