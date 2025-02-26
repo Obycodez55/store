@@ -11,25 +11,18 @@ export const authOptions: AuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        // phone: { label: "Phone", type: "tel", placeholder: "+1234567890" },
-        email: {
-          label: "Email",
-          type: "email",
-          placeholder: "example@gmai.com",
-        },
+        phone: { label: "Phone", type: "tel", placeholder: "+1234567890" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        if (!credentials?.phone || !credentials?.password) {
           throw new Error("Missing credentials");
         }
         console.log("credentials", { credentials });
         const user = await prisma.user.findFirst({
-          // where: { vendor: { phone: credentials.phone } },
-          where: { email: credentials.email },
+          where: { phone: credentials.phone },
           include: { vendor: true },
         });
-        console.log("user loggedin", { user });
         if (!user) {
           throw new Error("Invalid phone number or password");
         }
@@ -40,13 +33,14 @@ export const authOptions: AuthOptions = {
         );
 
         if (!isPasswordValid) {
-          throw new Error("Invalid email or password");
+          throw new Error("Invalid phone number or password");
         }
+        console.log("user loggedin", { user });
 
         return {
           id: user.id,
           name: user.name,
-          phone: user.vendor?.phone,
+          phone: user.phone,
           image: user.image,
         };
       },
@@ -55,10 +49,11 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt" as SessionStrategy,
   },
+  secret: process.env.NEXTAUTH_SECRET || "fallbacksecretdonotuseinproduction",
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.phone = user.vendor?.phone;
+        token.phone = user.phone;
       }
       return token;
     },

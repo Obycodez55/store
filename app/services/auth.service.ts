@@ -1,15 +1,15 @@
 import { signIn } from "next-auth/react";
 
 export async function login({
-  email,
+  phone,
   password,
 }: {
-  email: string;
+  phone: string;
   password: string;
 }) {
   const result = await signIn("credentials", {
     redirect: false,
-    email,
+    phone,
     password,
   });
   if (result?.error) {
@@ -20,11 +20,10 @@ export async function login({
 }
 
 export const register = async (data: {
-  email: string;
+  phone: string;
   password: string;
   name: string;
   marketId: string;
-  phone?: string;
   website?: string;
 }) => {
   const response = await fetch("/api/auth/register", {

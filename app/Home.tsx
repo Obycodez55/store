@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {  Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import MarketCard from "./components/MarketCard";
 import { MarketSearch } from "./components/MarketSearch";
 import { useRouter } from "next/navigation";
@@ -20,9 +20,9 @@ const containerVariants = {
     opacity: 1,
     transition: {
       staggerChildren: 0.1,
-      delayChildren: 0.3
-    }
-  }
+      delayChildren: 0.3,
+    },
+  },
 };
 
 const itemVariants = {
@@ -32,9 +32,9 @@ const itemVariants = {
     opacity: 1,
     transition: {
       type: "spring",
-      bounce: 0.4
-    }
-  }
+      bounce: 0.4,
+    },
+  },
 };
 
 // Types
@@ -46,8 +46,8 @@ type MarketData = {
   nextDate: string;
 };
 
-export function Home() {
-  const { data: markets, isLoading } = useMarkets();
+export default function Home() {
+  const { data: markets, isLoading: marketsIsLoading } = useMarkets();
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
@@ -62,7 +62,7 @@ export function Home() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen w-full bg-background">
+      <div className="bg-background w-full min-h-screen">
         <AnimatePresence>
           {showSuggestionModal && (
             <SuggestMarketModal
@@ -77,20 +77,20 @@ export function Home() {
         <motion.header
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="w-full bg-card shadow-sm sticky top-0 z-50 border-b border-border"
+          className="top-0 z-50 sticky bg-card shadow-sm border-b border-border w-full"
         >
           {/* Desktop Navigation */}
-          <div className="hidden md:flex w-full items-center justify-between py-4 px-6 max-w-7xl mx-auto">
+          <div className="md:flex justify-between items-center hidden mx-auto px-6 py-4 w-full max-w-7xl">
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="flex-shrink-0 cursor-pointer"
             >
-              <h1 className="text-2xl font-display font-bold">
+              <h1 className="font-bold font-display text-2xl">
                 Market<span className="text-primary">Place</span>
               </h1>
             </motion.div>
 
-            <div className="flex-grow max-w-2xl mx-8">
+            <div className="flex-grow mx-8 max-w-2xl">
               <MarketSearch
                 markets={Array.isArray(markets) ? markets : []}
                 onMarketSelect={handleMarketSelect}
@@ -113,19 +113,19 @@ export function Home() {
 
           {/* Mobile Navigation */}
           <div className="md:hidden">
-            <div className="flex items-center justify-between p-4">
-              <h1 className="text-xl font-display font-bold">
+            <div className="flex justify-between items-center p-4">
+              <h1 className="font-bold font-display text-xl">
                 Market<span className="text-primary">Place</span>
               </h1>
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="btn-secondary p-2"
+                className="p-2 btn-secondary"
               >
                 {isMenuOpen ? (
-                  <X className="h-6 w-6" />
+                  <X className="w-6 h-6" />
                 ) : (
-                  <Menu className="h-6 w-6" />
+                  <Menu className="w-6 h-6" />
                 )}
               </motion.button>
             </div>
@@ -138,7 +138,7 @@ export function Home() {
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="px-4 pb-4 space-y-4 overflow-hidden border-t border-border w-full"
+                  className="space-y-4 px-4 pb-4 border-t border-border w-full overflow-hidden"
                 >
                   <div className="w-full">
                     <MarketSearch
@@ -154,7 +154,7 @@ export function Home() {
                   >
                     <Link
                       href="/products"
-                      className="btn-secondary w-full justify-center"
+                      className="justify-center w-full btn-secondary"
                     >
                       Browse Products
                     </Link>
@@ -172,13 +172,13 @@ export function Home() {
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-b from-primary-50 to-background dark:from-primary-950/10 dark:to-background py-12"
+          className="bg-gradient-to-b from-primary-50 dark:from-primary-950/10 to-background dark:to-background py-12"
         >
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-primary-950 dark:text-primary-50 mb-4">
+          <div className="mx-auto px-4 text-center container">
+            <h1 className="mb-4 font-bold font-display text-4xl text-primary-950 md:text-5xl lg:text-6xl dark:text-primary-50">
               Discover Local Markets
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground md:text-xl">
               Find and explore the best local markets in your area. From fresh
               produce to handmade crafts.
             </p>
@@ -186,13 +186,13 @@ export function Home() {
         </motion.section>
 
         {/* Main Content */}
-        <main className="container mx-auto px-4 py-8">
+        <main className="mx-auto px-4 py-8 container">
           {/* Filters Section */}
-          <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex sm:flex-row flex-col justify-between items-start sm:items-center gap-4 mb-8">
             <motion.h2
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-2xl font-display font-semibold text-foreground"
+              className="font-display font-semibold text-2xl text-foreground"
             >
               Featured Markets
             </motion.h2>
@@ -203,9 +203,9 @@ export function Home() {
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr"
+            className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr"
           >
-            {isLoading ? (
+            {marketsIsLoading ? (
               <LoadingGrid />
             ) : (
               markets?.map((market) => (

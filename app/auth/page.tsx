@@ -13,16 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Icons } from "../components/Icons";
-import {
-  ArrowLeft,
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  User,
-  Phone,
-  Globe,
-} from "lucide-react";
+import { ArrowLeft, Lock, Eye, EyeOff, User, Phone, Globe } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -34,13 +25,20 @@ import Image from "next/image";
 
 // Form validation schema
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z
+  phone: z
     .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
+    .min(1, "Phone number is required")
+    .refine(
+      (val) => {
+        // Accept either format: +2349155004456 or 09155004456
+        const phoneRegex = /^(\+\d{1,})?(\d{10,15})$/;
+        return phoneRegex.test(val);
+      },
+      {
+        message: "Please enter a valid phone number",
+      }
+    ),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 const registerSchema = loginSchema
@@ -48,8 +46,12 @@ const registerSchema = loginSchema
     confirmPassword: z.string(),
     name: z.string().min(2, "Name must be at least 2 characters"),
     marketId: z.string().min(1, "Please select a market"),
-    website: z.string().url("Please enter a valid website URL").optional(),
-    phone: z.string().min(10, "Please enter a valid phone number").optional(),
+    website: z
+      .union([
+        z.string().url("Please enter a valid website URL"),
+        z.string().max(0),
+      ])
+      .optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -87,12 +89,11 @@ const Auth = () => {
   const form = useForm<AuthFormValues>({
     resolver: zodResolver(isLogin ? loginSchema : registerSchema),
     defaultValues: {
-      email: "",
+      phone: "",
       password: "",
       confirmPassword: "",
       name: "",
       marketId: "",
-      phone: "",
       website: "",
     },
   });
@@ -126,7 +127,7 @@ const Auth = () => {
       try {
         if (isLogin) {
           await login({
-            email: data.email,
+            phone: data.phone,
             password: data.password,
           });
           toast.success("Welcome back!", {
@@ -135,18 +136,17 @@ const Auth = () => {
           router.push("/dashboard");
         } else {
           await register({
-            email: data.email,
+            phone: data.phone,
             password: data.password,
             name: data.name,
             marketId: data.marketId,
-            phone: data.phone,
             website: data.website,
           });
           toast.success("Account created!", {
             description: "Your account has been successfully created.",
           });
           await login({
-            email: data.email,
+            phone: data.phone,
             password: data.password,
           });
           router.push("/dashboard");
@@ -263,21 +263,21 @@ const Auth = () => {
                   className="space-y-4"
                 >
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="phone">Phone Number</Label>
                     <div className="relative">
                       <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        {...form.register("email")}
+                        id="phone"
+                        type="tel"
+                        placeholder="Enter your phone number"
+                        {...form.register("phone")}
                         disabled={isLoading}
                         className="pl-10"
                       />
-                      <Mail className="top-2.5 left-3 absolute w-5 h-5 text-muted-foreground" />
+                      <Phone className="top-2.5 left-3 absolute w-5 h-5 text-muted-foreground" />
                     </div>
-                    {form.formState.errors.email && (
+                    {form.formState.errors.phone && (
                       <p className="text-destructive text-sm">
-                        {form.formState.errors.email.message}
+                        {form.formState.errors.phone.message}
                       </p>
                     )}
                   </div>
@@ -324,26 +324,6 @@ const Auth = () => {
                         {form.formState.errors.marketId && (
                           <p className="text-destructive text-sm">
                             {form.formState.errors.marketId.message}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <div className="relative">
-                          <Input
-                            id="phone"
-                            type="tel"
-                            placeholder="Enter your phone number"
-                            {...form.register("phone")}
-                            disabled={isLoading}
-                            className="pl-10"
-                          />
-                          <Phone className="top-2.5 left-3 absolute w-5 h-5 text-muted-foreground" />
-                        </div>
-                        {form.formState.errors.phone && (
-                          <p className="text-destructive text-sm">
-                            {form.formState.errors.phone.message}
                           </p>
                         )}
                       </div>
