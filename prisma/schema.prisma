@@ -10,11 +10,9 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   name          String?
-  email         String?   @unique
-  emailVerified DateTime?
   password      String
   image         String?
-  phone         String?  @unique
+  phone         String    @unique // Now required
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   vendorId      String?   @unique
