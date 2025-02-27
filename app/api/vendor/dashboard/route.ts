@@ -11,7 +11,7 @@ export async function GET() {
     }
 
     const vendor = await prisma.vendor.findFirst({
-      where: { user: {id: session.user.id} },
+      where: { user: { id: session.user.id } },
       include: {
         market: {
           select: {
@@ -21,6 +21,7 @@ export async function GET() {
             description: true,
           },
         },
+        products: true,
       },
     });
 
@@ -30,7 +31,7 @@ export async function GET() {
 
     return NextResponse.json(vendor);
   } catch (error) {
-    console.error("Error fetching vendor dashboard:", error);
+    console.log("Error fetching vendor dashboard:", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

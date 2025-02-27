@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { Tags } from "@prisma/client";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -45,55 +46,78 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const formData = await req.formData();
+    const formData = await request.formData();
 
-    // Get vendor
+    // Validate required fields
+    const name = formData.get("name") as string;
+    const description = formData.get("description") as string;
+    const priceStr = formData.get("price") as string;
+    const tag = formData.get("tag") as Tags;
+    const imageFile = formData.get("image") as Blob | null;
+
+    if (!imageFile) {
+      console.log([...formData.keys()]);
+      return NextResponse.json({ error: "Image is required" }, { status: 400 });
+    }
+    if (!name || !description || !priceStr) {
+      return NextResponse.json(
+        { error: "Name, description, and price are required" },
+        { status: 400 }
+      );
+    }
+
+    const price = parseFloat(priceStr);
+    if (isNaN(price)) {
+      return NextResponse.json({ error: "Invalid price" }, { status: 400 });
+    }
+
+    // Find the vendor associated with the user
     const vendor = await prisma.vendor.findFirst({
-      where: {
-        user: {
-          id: session.user.id,
-        },
-      },
+      where: { user: { id: session.user.id } },
     });
 
     if (!vendor) {
-      return new NextResponse("Vendor not found", { status: 404 });
+      return NextResponse.json(
+        { error: "Vendor account not found" },
+        { status: 404 }
+      );
     }
 
-    // Upload image to Cloudinary if provided
+    // Handle image upload
     let imageUrl = null;
-    const image = formData.get("image") as File | null;
-    if (image) {
-      const imageBuffer = await image.arrayBuffer();
-      const imageBase64 = Buffer.from(imageBuffer).toString("base64");
-      const result = await cloudinary.uploader.upload(
-        `data:${image.type};base64,${imageBase64}`,
-        { folder: "products" }
-      );
-      imageUrl = result.secure_url;
-    }
+    // Check if the image is a base64 string
+    // * NB: imageFile starts with data:
+    // Use the base64 data URI directly
+    const uploadResult = await cloudinary.uploader.upload(imageFile, {
+      folder: "products",
+    });
+    imageUrl = uploadResult.secure_url;
 
     // Create product
     const product = await prisma.product.create({
       data: {
-        name: formData.get("name") as string,
-        description: formData.get("description") as string,
-        price: parseFloat(formData.get("price") as string),
+        name,
+        description,
+        price,
+        tags: [tag || Tags.OTHER],
         image: imageUrl,
         vendorId: vendor.id,
       },
     });
 
-    return NextResponse.json(product);
+    return NextResponse.json(product, { status: 201 });
   } catch (error) {
-    console.error("Error creating product:", JSON.stringify(error));
-    return new NextResponse("Internal error", { status: 500 });
+    console.log("Error creating product:", JSON.stringify(error));
+    return NextResponse.json(
+      { error: "Failed to create product" },
+      { status: 500 }
+    );
   }
 }

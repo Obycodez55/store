@@ -1,17 +1,13 @@
 "use client";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
 import MarketCard from "./components/MarketCard";
-import { MarketSearch } from "./components/MarketSearch";
 import { useRouter } from "next/navigation";
 import { SuggestMarketModal } from "./components/MarketSuggestModal";
 import { useMarkets } from "./hooks/useMarkets";
 import { Market } from "@/types/market";
 import { PageTransition } from "./components/PageTransition";
-import { UserMenu } from "./components/UserMenu";
 import { LoadingGrid } from "./components/LoadingGrid";
-import Link from "next/link";
 
 // Animation variants
 const containerVariants = {
@@ -49,7 +45,6 @@ type MarketData = {
 export default function Home() {
   const { data: markets, isLoading: marketsIsLoading } = useMarkets();
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
 
   const handleMarketSelect = (market: Market) => {
@@ -73,101 +68,6 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        {/* Header */}
-        <motion.header
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="top-0 z-50 sticky bg-card shadow-sm border-b border-border w-full"
-        >
-          {/* Desktop Navigation */}
-          <div className="md:flex justify-between items-center hidden mx-auto px-6 py-4 w-full max-w-7xl">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex-shrink-0 cursor-pointer"
-            >
-              <h1 className="font-bold font-display text-2xl">
-                Market<span className="text-primary">Place</span>
-              </h1>
-            </motion.div>
-
-            <div className="flex-grow mx-8 max-w-2xl">
-              <MarketSearch
-                markets={Array.isArray(markets) ? markets : []}
-                onMarketSelect={handleMarketSelect}
-                onSuggestMarket={() => setShowSuggestionModal(true)}
-              />
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mr-4"
-            >
-              <Link href="/products" className="btn-secondary">
-                Browse Products
-              </Link>
-            </motion.div>
-
-            <UserMenu />
-          </div>
-
-          {/* Mobile Navigation */}
-          <div className="md:hidden">
-            <div className="flex justify-between items-center p-4">
-              <h1 className="font-bold font-display text-xl">
-                Market<span className="text-primary">Place</span>
-              </h1>
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 btn-secondary"
-              >
-                {isMenuOpen ? (
-                  <X className="w-6 h-6" />
-                ) : (
-                  <Menu className="w-6 h-6" />
-                )}
-              </motion.button>
-            </div>
-
-            {/* Mobile Menu */}
-            <AnimatePresence>
-              {isMenuOpen && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-4 px-4 pb-4 border-t border-border w-full overflow-hidden"
-                >
-                  <div className="w-full">
-                    <MarketSearch
-                      markets={Array.isArray(markets) ? markets : []}
-                      onMarketSelect={handleMarketSelect}
-                      onSuggestMarket={() => setShowSuggestionModal(true)}
-                    />
-                  </div>
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="w-full"
-                  >
-                    <Link
-                      href="/products"
-                      className="justify-center w-full btn-secondary"
-                    >
-                      Browse Products
-                    </Link>
-                  </motion.div>
-                  <div className="w-full">
-                    <UserMenu />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.header>
-
         {/* Hero Section */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
@@ -176,10 +76,10 @@ export default function Home() {
         >
           <div className="mx-auto px-4 text-center container">
             <h1 className="mb-4 font-bold font-display text-4xl text-primary-950 md:text-5xl lg:text-6xl dark:text-primary-50">
-              Discover Local Markets
+              Discover Local Markets In Ibadan
             </h1>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground md:text-xl">
-              Find and explore the best local markets in your area. From fresh
+              Find and explore the best local markets in Ibadan. From fresh
               produce to handmade crafts.
             </p>
           </div>

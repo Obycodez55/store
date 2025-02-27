@@ -1,85 +1,58 @@
+import "@/app/globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
-import Providers from "./Providers";
-import { ToasterProvider } from "./components/Toaster";
+import { Poppins } from "next/font/google";
+import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
+import AuthProvider from "@/components/auth-provider";
+import { TanstackProvider } from "@/components/tanstack-provider";
+import HeaderClientWrapper from "./components/HeaderClientWrapper";
 
-// Initialize Inter font
-const inter = Inter({
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const poppins = Poppins({
   subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap"
+  weight: ["400", "500", "600", "700", "800", "900"],
+  variable: "--font-display",
 });
 
 export const metadata: Metadata = {
-  title: {
-    template: "%s | MarketPlace",
-    default: "MarketPlace - Discover Local Markets"
-  },
-  description:
-    "Find and explore the best local markets in your area. From fresh produce to handmade crafts.",
-  icons: {
-    icon: [
-      {
-        url: "/favicon.ico",
-        sizes: "32x32"
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml"
-      }
-    ],
-    apple: "/apple-touch-icon.png",
-    shortcut: "/favicon.ico"
-  },
-  manifest: "/site.webmanifest"
+  title: "Local Marketplace",
+  description: "Find and explore local markets and vendors",
 };
 
-export default function RootLayout({
-  children
-}: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // Fetch markets server-side for the initial header state
+  const markets = await fetch(
+    `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/markets`
+  )
+    .then((res) => (res.ok ? res.json() : []))
+    .catch(() => []);
+
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} h-full scroll-smooth`}
-      suppressHydrationWarning // Prevents dark mode flicker
-    >
-      <head>
-        {/* Preload critical assets */}
-        <link
-          rel="preconnect"
-          href="https://fonts.googleapis.com"
-          crossOrigin="anonymous"
-        />
-      </head>
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`
-          min-h-full
-          antialiased
-          bg-slate-50 
-          text-slate-900
-          transition-colors
-          duration-200
-          selection:bg-primary-200 
-          selection:text-primary-900
-          dark:bg-dark-bg
-          dark:text-dark-text-primary
-          dark:selection:bg-primary-800
-          dark:selection:text-primary-50
-        `}
+        className={`min-h-screen bg-background font-sans antialiased ${inter.variable} ${poppins.variable}`}
       >
-        <Providers>
-          {/* Skip to main content link for accessibility */}
-          <a href="#main-content" className="skip-to-content">
-            Skip to main content
-          </a>
-
-          {/* Main content wrapper */}
-          <div id="main-content">{children}</div>
-
-          {/* Toast notifications */}
-          <ToasterProvider />
-        </Providers>
+        <ThemeProvider
+          attribute="class"
+          // defaultTheme="system"
+          // enableSystem
+          defaultTheme="light"
+          forcedTheme="light"
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <TanstackProvider>
+              <HeaderClientWrapper initialMarkets={markets} />
+              {children}
+              <Toaster position="top-center" />
+            </TanstackProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

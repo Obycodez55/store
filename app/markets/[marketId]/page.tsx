@@ -6,7 +6,7 @@ import { getMarketDays } from "@/app/utils/getMarketDays";
 import moment from "moment";
 import { subscribe } from "@/app/utils/subscribe";
 import { MarketDaysDisplay } from "@/app/components/MarketDays";
-import ProductCard from "@/app/components/ProductCard";
+import { ProductCard } from "@/app/components/ProductCard";
 import { MapPin, Calendar, Info, Package } from "lucide-react";
 import { PageTransition } from "@/app/components/PageTransition";
 import { UserMenu } from "@/app/components/UserMenu";
@@ -79,7 +79,6 @@ const Market = () => {
       }));
     });
   }, [market]);
-
   // Market days calculation
   const marketDays = useMemo(() => {
     if (!market?.prevDate || !market?.nextDate) {
@@ -200,7 +199,7 @@ const Market = () => {
         {/* Hero Section with Image Slider */}
         <div className="relative h-[60vh] md:h-[70vh]">
           {/* Header */}
-          <div className="top-0 right-0 left-0 z-10 absolute bg-gradient-to-b from-black/60 to-transparent">
+          {/* <div className="top-0 right-0 left-0 z-10 absolute bg-gradient-to-b from-black/60 to-transparent">
             <div className="mx-auto px-4 py-4 container">
               <div className="flex md:flex-row flex-col justify-between items-start md:items-center gap-4">
                 <motion.a
@@ -228,7 +227,7 @@ const Market = () => {
                 <UserMenu />
               </div>
             </div>
-          </div>
+          </div> */}
 
           <AnimatePresence mode="wait">
             <motion.img
@@ -342,24 +341,7 @@ const Market = () => {
                       variants={itemVariants}
                       className="h-full"
                     >
-                      <ProductCard
-                        id={product.id}
-                        name={product.name}
-                        description={product.description || ""}
-                        price={product.price}
-                        image={product.image || ""}
-                        category={product.tags}
-                        vendor={{
-                          name: product.vendor.name,
-                          email: product.vendor.email ?? undefined,
-                          phone: product.vendor.phone ?? undefined,
-                          website: product.vendor.website ?? undefined,
-                          market: {
-                            name: market.name,
-                            location: market.location,
-                          },
-                        }}
-                      />
+                      <ProductCard product={product} />
                     </motion.div>
                   ))}
                 </motion.div>
