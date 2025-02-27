@@ -29,33 +29,51 @@ export async function POST(req: NextRequest) {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create a new vendor
-    const vendor = await prisma.vendor.create({
-      data: {
-        name,
-        marketId,
-        phone,
-        website,
-        goodsSold: [],
-      },
+    // Use a transaction to ensure both user and vendor are created properly
+    const result = await prisma.$transaction(async (tx) => {
+      // Create vendor first
+      const vendor = await tx.vendor.create({
+        data: {
+          name,
+          marketId,
+          phone,
+          website,
+          goodsSold: [],
+        },
+      });
+
+      console.log("Created vendor:", vendor);
+
+      // Create user with reference to vendor
+      const user = await tx.user.create({
+        data: {
+          name,
+          phone,
+          password: hashedPassword,
+          vendorId: vendor.id, // Ensure this is set properly
+        },
+        include: {
+          vendor: true, // Include vendor to verify relationship
+        },
+      });
+
+      console.log("Created user with vendor:", user);
+
+      return { user, vendor };
     });
 
-    // Create a new user connected to the vendor
-    const user = await prisma.user.create({
-      data: {
-        name,
-        phone,
-        password: hashedPassword,
-        vendorId: vendor.id,
-      },
-    });
-
+    // Return only necessary user information
     return NextResponse.json(
       {
         user: {
-          id: user.id,
-          name: user.name,
-          phone: user.phone,
+          id: result.user.id,
+          name: result.user.name,
+          phone: result.user.phone,
+          vendorId: result.user.vendorId,
+        },
+        vendor: {
+          id: result.vendor.id,
+          name: result.vendor.name,
         },
       },
       { status: 201 }

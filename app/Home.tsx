@@ -75,7 +75,7 @@ export default function Home() {
           className="bg-gradient-to-b from-primary-50 dark:from-primary-950/10 to-background dark:to-background py-12"
         >
           <div className="mx-auto px-4 text-center container">
-            <h1 className="mb-4 font-bold font-display text-4xl text-primary-950 md:text-5xl lg:text-6xl dark:text-primary-50">
+            <h1 className="mb-4 font-bold font-display text-4xl text-zinc-800 md:text-5xl lg:text-6xl dark:text-primary-50">
               Discover Local Markets In Ibadan
             </h1>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground md:text-xl">

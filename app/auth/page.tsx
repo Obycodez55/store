@@ -329,7 +329,7 @@ const Auth = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="website">Website</Label>
+                        <Label htmlFor="website">Website(optional)</Label>
                         <div className="relative">
                           <Input
                             id="website"

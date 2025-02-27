@@ -26,7 +26,7 @@ export async function GET(
         id: params.productId,
         vendor: {
           user: {
-            id: session.user.id,
+            phone: session.user.phone,
           },
         },
       },
@@ -61,7 +61,7 @@ export async function PUT(request: NextRequest, { params }: any) {
         id: params.productId,
         vendor: {
           user: {
-            id: session.user.id,
+            phone: session.user.phone,
           },
         },
       },
@@ -124,7 +124,7 @@ export async function DELETE(
         id: params.productId, // Changed from id to productId
         vendor: {
           user: {
-            id: session.user.id,
+            phone: session.user.phone,
           },
         },
       },

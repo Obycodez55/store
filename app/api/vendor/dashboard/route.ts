@@ -9,8 +9,20 @@ export async function GET() {
     if (!session?.user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    const vendor = await prisma.vendor.findFirst({
-      where: { user: { id: session.user.id } },
+
+    console.log("Session in dashboard:", { session });
+
+    // Use the vendorId from the session directly if available
+    const vendorId = session.user.vendorId;
+
+    if (!vendorId) {
+      return new NextResponse("No vendor associated with this account", {
+        status: 404,
+      });
+    }
+
+    const vendor = await prisma.vendor.findUnique({
+      where: { id: vendorId },
       include: {
         market: {
           select: {

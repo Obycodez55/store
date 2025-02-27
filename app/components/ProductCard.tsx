@@ -1,10 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { Tag, Store } from "lucide-react";
-import { ProductDetailsModal } from "./ProductDetailsModal";
-import Image from "next/image";
 import { Product } from "@prisma/client";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,7 +18,6 @@ interface ProductCardProps {
 export function ProductCard({
   product,
   isManageable,
-  onEdit,
   onDelete,
 }: ProductCardProps) {
   const router = useRouter();

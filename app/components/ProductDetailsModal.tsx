@@ -94,35 +94,36 @@ export const ProductDetailsModal = ({
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className="relative bg-card shadow-lg rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto"
+                className="relative bg-card shadow-lg rounded-lg w-full max-w-lg md:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto"
               >
                 {/* Close button */}
                 <button
                   onClick={onClose}
-                  className="top-4 right-4 absolute text-muted-foreground hover:text-foreground transition-colors"
+                  className="top-4 right-4 z-10 absolute text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
 
                 {/* Product image */}
-                <div className="relative w-full h-48 md:h-64">
+                <div className="relative w-full h-48 md:h-72 lg:h-96">
                   <Image
                     src={product.image}
                     alt={product.name}
-                    width={400}
-                    height={400}
+                    width={800}
+                    height={800}
                     className="rounded-t-lg w-full h-full object-cover"
+                    priority
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="bottom-4 left-4 absolute text-white">
-                    <h3 className="font-bold font-display text-xl">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  <div className="bottom-6 left-6 absolute text-white">
+                    <h3 className="font-bold font-display text-xl md:text-2xl lg:text-3xl">
                       {product.name}
                     </h3>
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="space-y-6 p-6">
+                <div className="space-y-6 p-6 md:p-8">
                   {/* Vendor section */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-primary">

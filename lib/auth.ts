@@ -43,6 +43,7 @@ export const authOptions: AuthOptions = {
           name: user.name,
           phone: user.phone,
           image: user.image,
+          vendorId: user.vendorId,
         };
       },
     }),
@@ -55,12 +56,14 @@ export const authOptions: AuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.phone = (user as User & { phone: string }).phone;
+        token.vendorId = (user as User & { vendorId: string | null }).vendorId;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
-        session.user.phone = token.phone;
+        session.user.phone = token.phone as string;
+        session.user.vendorId = token.vendorId;
       }
       return session;
     },

@@ -94,7 +94,7 @@ model Vendor {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   email     String?
-  phone     String?
+  phone     String
   website   String?
   goodsSold String[]
   products  Product[]

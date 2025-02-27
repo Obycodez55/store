@@ -8,14 +8,21 @@ import { formatPrice } from "@/lib/utils";
 interface ProductGridProps {
   products: Product[];
   onProductSelect: (product: Product) => void;
+  variant?: "default" | "search";
 }
 
 export const ProductGrid = ({
   products,
   onProductSelect,
+  variant = "default",
 }: ProductGridProps) => {
+  const gridClass =
+    variant === "search"
+      ? "gap-3 grid grid-cols-1 sm:grid-cols-2 auto-rows-[minmax(0,15rem)]"
+      : "gap-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[minmax(0,20rem)]";
+
   return (
-    <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-[minmax(0,20rem)]">
+    <div className={gridClass}>
       {products.map((product) => (
         <Card
           key={product.id}

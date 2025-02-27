@@ -61,6 +61,8 @@ export async function POST(request: NextRequest) {
     const tag = formData.get("tag") as Tags;
     const imageFile = formData.get("image") as Blob | null;
 
+    console.log({ session, name, description, tag, imageFile });
+    // return NextResponse.json({ message: "Failed" }, { status: 401 });
     if (!imageFile) {
       console.log([...formData.keys()]);
       return NextResponse.json({ error: "Image is required" }, { status: 400 });
@@ -74,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     // Find the vendor associated with the user
     const vendor = await prisma.vendor.findFirst({
-      where: { user: { id: session.user.id } },
+      where: { user: { phone: session.user.phone } },
     });
 
     if (!vendor) {
@@ -87,7 +89,7 @@ export async function POST(request: NextRequest) {
     // Handle image upload
     let imageUrl = null;
     // Check if the image is a base64 string
-    // * NB: imageFile starts with data:
+    // * NB: imageFile starts with "data:" so acceptable to upload directly
     // Use the base64 data URI directly
     const uploadResult = await cloudinary.uploader.upload(imageFile, {
       folder: "products",
