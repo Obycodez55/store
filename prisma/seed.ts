@@ -25,18 +25,24 @@ const productImages = [
 // Read market data from Excel file
 function readMarketData() {
   const workbook = XLSX.readFile(join(__dirname, "markets.xlsx"));
-  const sheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sheetName];
-  const data = XLSX.utils.sheet_to_json(worksheet);
+  const sheet1 = workbook.SheetNames[0];
+  const sheet2 = workbook.SheetNames[1];
+  const worksheet1 = workbook.Sheets[sheet1];
+  const worksheet2 = workbook.Sheets[sheet2];
+  const data1 = XLSX.utils.sheet_to_json(worksheet1);
+  const data2 = XLSX.utils.sheet_to_json(worksheet2);
 
-  return data.map((row: any) => ({
+  const combinedData = [...data1, ...data2];
+
+  return combinedData.map((row: any) => ({
     name: row["Market Name"],
     location: row["Location"] || "Location not specified",
     description: row["Description"] || "Description not specified",
-    prevDate: new Date(row["Previous Market Day"] || Date.now()),
-    nextDate: new Date(
-      row["Next Market Day"] || Date.now() + 7 * 24 * 60 * 60 * 1000
-    ),
+    prevDate: row["Previous Market Day"]
+      ? new Date(row["Previous Market Day"])
+      : null,
+    nextDate: row["Next Market Day"] ? new Date(row["Next Market Day"]) : null,
+    interval: row["Interval"],
   }));
 }
 
@@ -58,8 +64,9 @@ async function seed() {
           description: marketInfo.description,
           image: faker.helpers.arrayElement(marketImages),
           location: marketInfo.location,
-          prevDate: marketInfo.prevDate,
-          nextDate: marketInfo.nextDate,
+          prevDate: marketInfo.prevDate as Date,
+          nextDate: marketInfo.nextDate as Date,
+          interval: marketInfo.interval,
           images: {
             create: marketImages.map((url) => ({ url })),
           },

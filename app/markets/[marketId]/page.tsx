@@ -81,7 +81,7 @@ const Market = () => {
   }, [market]);
   // Market days calculation
   const marketDays = useMemo(() => {
-    if (!market?.prevDate || !market?.nextDate) {
+    if (!market) {
       return {
         interval: null,
         lastMarketDay: null,
@@ -92,28 +92,26 @@ const Market = () => {
     }
 
     // Use current date if the dates are invalid (1970)
-    const prevDate = new Date(market.prevDate);
-    const nextDate = new Date(market.nextDate);
 
-    const useCurrentDate =
-      prevDate.getFullYear() === 1970 || nextDate.getFullYear() === 1970;
+    const prevDate = market.prevDate && new Date(market.prevDate);
+    const nextDate = market.nextDate && new Date(market.nextDate);
 
-    if (useCurrentDate) {
-      const today = new Date();
-      return {
-        interval: 7, // default to weekly
-        lastMarketDay: today,
-        nextMarketDay: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000),
-        formattedLastMarketDay: moment(today).format("MMMM DD, YYYY"),
-        formattedNextMarketDay: moment(today)
-          .add(7, "days")
-          .format("MMMM DD, YYYY"),
-      };
-    }
+    // if (useCurrentDate) {
+    //   const today = new Date();
+    //   return {
+    //     interval: 7, // default to weekly
+    //     lastMarketDay: today,
+    //     nextMarketDay: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000),
+    //     formattedLastMarketDay: moment(today).format("MMMM DD, YYYY"),
+    //     formattedNextMarketDay: moment(today)
+    //       .add(7, "days")
+    //       .format("MMMM DD, YYYY"),
+    //   };
+    // }
 
     const { lastMarketDay, nextMarketDay, interval } = getMarketDays(
       moment(prevDate).format("YYYY-MM-DD"),
-      moment(nextDate).format("YYYY-MM-DD")
+      market.interval
     );
 
     return {

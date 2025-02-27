@@ -20,7 +20,7 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const marketId = searchParams.get("marketId");
-    console.log({ marketId });
+    console.log({ session });
     const products = await prisma.product.findMany({
       where: marketId
         ? {

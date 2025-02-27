@@ -9,7 +9,6 @@ export async function GET() {
     if (!session?.user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-
     const vendor = await prisma.vendor.findFirst({
       where: { user: { id: session.user.id } },
       include: {
@@ -25,6 +24,7 @@ export async function GET() {
       },
     });
 
+    console.log({ session, vendor });
     if (!vendor) {
       return new NextResponse("Vendor not found", { status: 404 });
     }
