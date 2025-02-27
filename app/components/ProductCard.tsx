@@ -59,7 +59,7 @@ export function ProductCard({
           <img
             src={product.image}
             alt={product.name}
-            className="object-cover"
+            className="aspect-2 object-cover"
           />
         ) : (
           <div className="flex justify-center items-center bg-muted/50 w-full h-full">
@@ -72,7 +72,6 @@ export function ProductCard({
         <p className="mt-2 line-clamp-2 text-muted-foreground text-sm">
           {product.description}
         </p>
-        <p className="mt-2 font-semibold text-lg">${product.price}</p>
       </CardContent>
       {isManageable && (
         <CardFooter className="gap-2 p-4 pt-0">

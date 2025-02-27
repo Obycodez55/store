@@ -8,7 +8,7 @@ import { ProductGrid } from "../components/ProductGrid";
 import { ProductPagination } from "../components/ProductPagination";
 import {
   ModalProduct,
-  ProductDetailsModal
+  ProductDetailsModal,
 } from "../components/ProductDetailsModal";
 import { useProductSearch } from "../hooks/useProductSearch";
 import { Product } from "@/types/market";
@@ -56,20 +56,20 @@ function ProductsPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+      <header className="top-0 z-50 sticky bg-background/80 backdrop-blur-sm border-b w-full">
+        <div className="mx-auto px-4 container">
+          <div className="flex justify-between items-center h-16">
             <motion.a
               href="/"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-xl font-display font-bold"
+              className="font-bold font-display text-xl"
             >
               Market<span className="text-primary">Place</span>
             </motion.a>
-            <div className="w-full max-w-xl mx-4">
+            <div className="mx-4 w-full max-w-xl">
               <Suspense fallback={<LoadingScreen />}>
                 <ProductSearch onProductSelect={handleProductSelect} />
               </Suspense>
@@ -79,23 +79,22 @@ function ProductsPageContent() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="mx-auto px-4 py-8 container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-8"
         >
           <div className="flex items-center gap-2 text-primary">
-            <Package className="h-5 w-5" />
-            <h1 className="text-2xl font-display font-semibold">
+            <Package className="w-5 h-5" />
+            <h1 className="font-display font-semibold text-2xl">
               Available Products
             </h1>
           </div>
 
           <ProductGrid
             products={products}
-            onProductClick={handleProductSelect}
-            isLoading={isLoading}
+            onProductSelect={handleProductSelect}
           />
 
           {pagination && pagination.pages > 1 && (

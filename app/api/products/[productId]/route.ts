@@ -94,7 +94,6 @@ export async function PUT(request: NextRequest, { params }: any) {
       data: {
         name: formData.get("name") as string,
         description: formData.get("description") as string,
-        price: parseFloat(formData.get("price") as string),
         image: imageUrl,
         tags: tags,
       },

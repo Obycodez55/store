@@ -106,7 +106,6 @@ model Product {
   name        String
   description String?
   image       String?
-  price       Float
   vendorId    String
   tags        Tags[]
   createdAt   DateTime @default(now())

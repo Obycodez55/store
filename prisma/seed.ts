@@ -82,9 +82,6 @@ async function seed() {
                       name: faker.commerce.productName(),
                       description: faker.commerce.productDescription(),
                       image: faker.helpers.arrayElement(productImages),
-                      price: parseFloat(
-                        faker.commerce.price({ min: 5, max: 50 })
-                      ),
                       tags: [faker.helpers.arrayElement(Object.values(Tags))],
                     })),
                   },

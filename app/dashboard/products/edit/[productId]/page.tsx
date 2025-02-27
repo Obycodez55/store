@@ -133,19 +133,6 @@ export default function EditProduct({
                   <div className="gap-4 grid grid-cols-2">
                     <div>
                       <label className="block mb-1 font-medium text-sm">
-                        Price ($)
-                      </label>
-                      <Input
-                        name="price"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        required
-                        defaultValue={product.price.toString()}
-                      />
-                    </div>
-                    <div>
-                      <label className="block mb-1 font-medium text-sm">
                         Category
                       </label>
                       <Select

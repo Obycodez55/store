@@ -58,7 +58,6 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
-    const priceStr = formData.get("price") as string;
     const tag = formData.get("tag") as Tags;
     const imageFile = formData.get("image") as Blob | null;
 
@@ -66,16 +65,11 @@ export async function POST(request: NextRequest) {
       console.log([...formData.keys()]);
       return NextResponse.json({ error: "Image is required" }, { status: 400 });
     }
-    if (!name || !description || !priceStr) {
+    if (!name || !description) {
       return NextResponse.json(
-        { error: "Name, description, and price are required" },
+        { error: "Name and description are required" },
         { status: 400 }
       );
-    }
-
-    const price = parseFloat(priceStr);
-    if (isNaN(price)) {
-      return NextResponse.json({ error: "Invalid price" }, { status: 400 });
     }
 
     // Find the vendor associated with the user
@@ -105,7 +99,6 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         description,
-        price,
         tags: [tag || Tags.OTHER],
         image: imageUrl,
         vendorId: vendor.id,
