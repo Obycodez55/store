@@ -11,11 +11,7 @@ export async function GET() {
     }
 
     const vendor = await prisma.vendor.findFirst({
-<<<<<<< Updated upstream
-      where: { user: {id: session.user.id} },
-=======
       where: { user: { id: session.user.id } },
->>>>>>> Stashed changes
       include: {
         market: {
           select: {
