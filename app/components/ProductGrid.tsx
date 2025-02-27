@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Product } from "@/types/market";
-import ProductCard from "./ProductCard";
+import { ProductCard } from "./ProductCard";
 import { LoadingGrid } from "./LoadingGrid";
 
 interface ProductGridProps {
@@ -16,9 +16,9 @@ const containerVariants = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
-    }
-  }
+      staggerChildren: 0.1,
+    },
+  },
 };
 
 const itemVariants = {
@@ -28,15 +28,15 @@ const itemVariants = {
     y: 0,
     transition: {
       type: "spring",
-      bounce: 0.4
-    }
-  }
+      bounce: 0.4,
+    },
+  },
 };
 
 export const ProductGrid = ({
   products,
   onProductClick,
-  isLoading
+  isLoading,
 }: ProductGridProps) => {
   if (isLoading) {
     return <LoadingGrid />;
@@ -44,8 +44,8 @@ export const ProductGrid = ({
 
   if (!products.length) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-xl font-semibold mb-2">No Products Found</h2>
+      <div className="py-12 text-center">
+        <h2 className="mb-2 font-semibold text-xl">No Products Found</h2>
         <p className="text-muted-foreground">
           Try adjusting your search or browse all products
         </p>
@@ -58,7 +58,7 @@ export const ProductGrid = ({
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+      className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
     >
       {products.map((product) => (
         <motion.div
@@ -81,8 +81,8 @@ export const ProductGrid = ({
               website: product.vendor.website ?? undefined,
               market: {
                 name: product.vendor.market.name,
-                location: product.vendor.market.location
-              }
+                location: product.vendor.market.location,
+              },
             }}
           />
         </motion.div>
