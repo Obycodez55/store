@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
-import { Store, Package, Plus, X } from "lucide-react";
+import { Store, Package, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import { PageTransition } from "@/app/components/PageTransition";
+import Link from "next/link";
+import { ProductCard } from "@/app/components/ProductCard";
+import { Product } from "@prisma/client";
 
 interface VendorDashboardData {
   id: string;
@@ -23,59 +23,64 @@ interface VendorDashboardData {
     description: string;
   };
   goodsSold: string[];
+  products: {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    imageUrl: string;
+  }[];
 }
 
 export default function Dashboard() {
   const { data: session } = useSession();
-  const [newItem, setNewItem] = useState("");
-
   const { data: vendorData, refetch } = useQuery<VendorDashboardData>({
     queryKey: ["vendor-dashboard"],
     queryFn: async () => {
       const response = await fetch("/api/vendor/dashboard");
       if (!response.ok) throw new Error("Failed to fetch vendor data");
       return response.json();
-    }
+    },
   });
 
-  const handleAddItem = async () => {
-    if (!newItem.trim()) return;
+  // const handleAddItem = async () => {
+  //   if (!newItem.trim()) return;
 
-    try {
-      const response = await fetch("/api/vendor/goods", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ item: newItem.trim() })
-      });
+  //   try {
+  //     const response = await fetch("/api/vendor/goods", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ item: newItem.trim() }),
+  //     });
 
-      if (!response.ok) throw new Error("Failed to add item");
+  //     if (!response.ok) throw new Error("Failed to add item");
 
-      toast.success("Item added successfully");
-      setNewItem("");
-      refetch();
-    } catch (error) {
-      console.log(error)
-      toast.error("Failed to add item");
-    }
-  };
+  //     toast.success("Item added successfully");
+  //     setNewItem("");
+  //     refetch();
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error("Failed to add item");
+  //   }
+  // };
 
-  const handleRemoveItem = async (item: string) => {
-    try {
-      const response = await fetch("/api/vendor/goods", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ item })
-      });
+  // const handleRemoveItem = async (item: string) => {
+  //   try {
+  //     const response = await fetch("/api/vendor/goods", {
+  //       method: "DELETE",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ item }),
+  //     });
 
-      if (!response.ok) throw new Error("Failed to remove item");
+  //     if (!response.ok) throw new Error("Failed to remove item");
 
-      toast.success("Item removed successfully");
-      refetch();
-    } catch (error) {
-      console.log(error)
-      toast.error("Failed to remove item");
-    }
-  };
+  //     toast.success("Item removed successfully");
+  //     refetch();
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error("Failed to remove item");
+  //   }
+  // };
 
   if (!session?.user) {
     return null;
@@ -83,24 +88,24 @@ export default function Dashboard() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-background">
-        <main className="container mx-auto px-4 py-8">
-          <div className="grid gap-6 md:grid-cols-2">
+      <div className="bg-background min-h-screen">
+        <main className="mx-auto px-4 py-8 container">
+          <div className="gap-6 grid md:grid-cols-2">
             {/* Market Info */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-card rounded-lg border border-border p-6"
+              className="bg-card p-6 border border-border rounded-lg"
             >
               <div className="flex items-center gap-2 mb-4">
-                <Store className="h-5 w-5 text-primary" />
-                <h2 className="text-xl font-semibold">Your Market</h2>
+                <Store className="w-5 h-5 text-primary" />
+                <h2 className="font-semibold text-xl">Your Market</h2>
               </div>
               {vendorData?.market && (
                 <div className="space-y-4">
                   <div>
                     <h3 className="font-medium">{vendorData.market.name}</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       {vendorData.market.location}
                     </p>
                   </div>
@@ -114,17 +119,17 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-card rounded-lg border border-border p-6"
+              className="bg-card p-6 border border-border rounded-lg"
             >
               <div className="flex items-center gap-2 mb-4">
-                <Store className="h-5 w-5 text-primary" />
-                <h2 className="text-xl font-semibold">Your Details</h2>
+                <Store className="w-5 h-5 text-primary" />
+                <h2 className="font-semibold text-xl">Your Details</h2>
               </div>
               {vendorData && (
                 <div className="space-y-4">
                   <div>
                     <h3 className="font-medium">{vendorData.name}</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       {vendorData.email}
                     </p>
                   </div>
@@ -139,19 +144,18 @@ export default function Dashboard() {
             </motion.div>
 
             {/* Goods Sold */}
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="md:col-span-2 bg-card rounded-lg border border-border p-6"
+              className="md:col-span-2 bg-card p-6 border border-border rounded-lg"
             >
               <div className="flex items-center gap-2 mb-6">
-                <Package className="h-5 w-5 text-primary" />
-                <h2 className="text-xl font-semibold">Goods You Sell</h2>
+                <Package className="w-5 h-5 text-primary" />
+                <h2 className="font-semibold text-xl">Goods You Sell</h2>
               </div>
 
               <div className="space-y-4">
-                {/* Add new item */}
                 <div className="flex gap-2">
                   <Input
                     value={newItem}
@@ -160,18 +164,17 @@ export default function Dashboard() {
                     onKeyDown={(e) => e.key === "Enter" && handleAddItem()}
                   />
                   <Button onClick={handleAddItem}>
-                    <Plus className="h-4 w-4" />
+                    <Plus className="w-4 h-4" />
                   </Button>
                 </div>
 
-                {/* Items list */}
-                <div className="grid gap-2">
+                <div className="gap-2 grid">
                   {vendorData?.goodsSold.map((item) => (
                     <motion.div
                       key={item}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="flex items-center justify-between p-3 bg-background rounded-md border border-border"
+                      className="flex justify-between items-center bg-background p-3 border border-border rounded-md"
                     >
                       <span>{item}</span>
                       <Button
@@ -179,11 +182,43 @@ export default function Dashboard() {
                         size="icon"
                         onClick={() => handleRemoveItem(item)}
                       >
-                        <X className="h-4 w-4" />
+                        <X className="w-4 h-4" />
                       </Button>
                     </motion.div>
                   ))}
                 </div>
+              </div>
+            </motion.div> */}
+
+            {/* Products Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="md:col-span-2 bg-card p-6 border border-border rounded-lg"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-2">
+                  <Package className="w-5 h-5 text-primary" />
+                  <h2 className="font-semibold text-xl">Your Products</h2>
+                </div>
+                <Link href="/dashboard/products/add">
+                  <Button>
+                    <Plus className="mr-2 w-4 h-4" />
+                    Add Product
+                  </Button>
+                </Link>
+              </div>
+
+              <div className="gap-4 grid md:grid-cols-2 lg:grid-cols-3">
+                {vendorData?.products?.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product as any}
+                    isManageable
+                    onDelete={() => refetch()}
+                  />
+                ))}
               </div>
             </motion.div>
           </div>

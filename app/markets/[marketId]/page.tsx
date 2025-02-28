@@ -1,30 +1,22 @@
 "use client";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { getMarketDays } from "@/app/utils/getMarketDays";
 import moment from "moment";
 import { subscribe } from "@/app/utils/subscribe";
 import { MarketDaysDisplay } from "@/app/components/MarketDays";
-import ProductCard from "@/app/components/ProductCard";
 import { MapPin, Calendar, Info, Package } from "lucide-react";
 import { PageTransition } from "@/app/components/PageTransition";
-import { UserMenu } from "@/app/components/UserMenu";
 import ProductCardSkeleton from "@/app/components/ProductCardSkeleton";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-
-// Animation variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
-  },
-};
+import { ProductGrid } from "@/app/components/ProductGrid";
+import {
+  ModalProduct,
+  ProductDetailsModal,
+} from "@/app/components/ProductDetailsModal";
+import { Product } from "@/types/market";
 
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -40,8 +32,10 @@ const itemVariants = {
 
 const Market = () => {
   // New state to prevent hydration issues
-
   const { marketId } = useParams();
+  const searchParams = useSearchParams();
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
   const { data: market, isLoading: marketLoading } = useQuery({
     queryKey: ["market", marketId],
     queryFn: async () => {
@@ -54,10 +48,6 @@ const Market = () => {
     retry: false, // Prevent infinite retries
     refetchOnWindowFocus: false, // Prevent unnecessary refetches
   });
-
-  useEffect(() => {
-    console.log({ market });
-  }, [market]);
 
   const productsLoading = false;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -80,9 +70,45 @@ const Market = () => {
     });
   }, [market]);
 
+  // Handle URL-based modal state
+  useEffect(() => {
+    const productId = searchParams.get("product");
+    if (productId && marketProducts.length) {
+      let product = marketProducts.find((p) => p.id === productId);
+      console.log({ selectedProduct: product });
+      if (product) {
+        product = {
+          ...product,
+          vendor: {
+            ...product.vendor,
+            market: {
+              id: market.id,
+              name: market.name,
+              location: market.location,
+            },
+          },
+        };
+        setSelectedProduct(product);
+      }
+    }
+  }, [searchParams, marketProducts]);
+
+  const handleProductSelect = (product: Product) => {
+    // Update URL without navigation
+    const newUrl = `/markets/${marketId}?product=${product.id}`;
+    window.history.pushState({}, "", newUrl);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
+    // Remove product param from URL
+    const newUrl = `/markets/${marketId}`;
+    window.history.pushState({}, "", newUrl);
+  };
+
   // Market days calculation
   const marketDays = useMemo(() => {
-    if (!market?.prevDate || !market?.nextDate) {
+    if (!market) {
       return {
         interval: null,
         lastMarketDay: null,
@@ -93,28 +119,25 @@ const Market = () => {
     }
 
     // Use current date if the dates are invalid (1970)
-    const prevDate = new Date(market.prevDate);
-    const nextDate = new Date(market.nextDate);
 
-    const useCurrentDate =
-      prevDate.getFullYear() === 1970 || nextDate.getFullYear() === 1970;
+    const prevDate = market.prevDate && new Date(market.prevDate);
 
-    if (useCurrentDate) {
-      const today = new Date();
-      return {
-        interval: 7, // default to weekly
-        lastMarketDay: today,
-        nextMarketDay: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000),
-        formattedLastMarketDay: moment(today).format("MMMM DD, YYYY"),
-        formattedNextMarketDay: moment(today)
-          .add(7, "days")
-          .format("MMMM DD, YYYY"),
-      };
-    }
+    // if (useCurrentDate) {
+    //   const today = new Date();
+    //   return {
+    //     interval: 7, // default to weekly
+    //     lastMarketDay: today,
+    //     nextMarketDay: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000),
+    //     formattedLastMarketDay: moment(today).format("MMMM DD, YYYY"),
+    //     formattedNextMarketDay: moment(today)
+    //       .add(7, "days")
+    //       .format("MMMM DD, YYYY"),
+    //   };
+    // }
 
     const { lastMarketDay, nextMarketDay, interval } = getMarketDays(
       moment(prevDate).format("YYYY-MM-DD"),
-      moment(nextDate).format("YYYY-MM-DD")
+      market.interval
     );
 
     return {
@@ -200,35 +223,6 @@ const Market = () => {
         {/* Hero Section with Image Slider */}
         <div className="relative h-[60vh] md:h-[70vh]">
           {/* Header */}
-          <div className="top-0 right-0 left-0 z-10 absolute bg-gradient-to-b from-black/60 to-transparent">
-            <div className="mx-auto px-4 py-4 container">
-              <div className="flex md:flex-row flex-col justify-between items-start md:items-center gap-4">
-                <motion.a
-                  href="/"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-white hover:text-white/80 transition-colors"
-                >
-                  <span className="font-bold font-display text-xl">
-                    Market<span className="text-primary-300">Place</span>
-                  </span>
-                </motion.a>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="order-last md:order-none"
-                >
-                  <Link
-                    href="/products"
-                    className="border-white/20 bg-white/10 hover:bg-white/20 text-white btn-secondary"
-                  >
-                    Browse Products
-                  </Link>
-                </motion.div>
-                <UserMenu />
-              </div>
-            </div>
-          </div>
 
           <AnimatePresence mode="wait">
             <motion.img
@@ -330,43 +324,23 @@ const Market = () => {
                     ))}
                 </div>
               ) : (
-                <motion.div
-                  variants={containerVariants}
-                  initial="hidden"
-                  animate="show"
-                  className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-                >
-                  {marketProducts.map((product: any) => (
-                    <motion.div
-                      key={product.id}
-                      variants={itemVariants}
-                      className="h-full"
-                    >
-                      <ProductCard
-                        id={product.id}
-                        name={product.name}
-                        description={product.description || ""}
-                        price={product.price}
-                        image={product.image || ""}
-                        category={product.tags}
-                        vendor={{
-                          name: product.vendor.name,
-                          email: product.vendor.email ?? undefined,
-                          phone: product.vendor.phone ?? undefined,
-                          website: product.vendor.website ?? undefined,
-                          market: {
-                            name: market.name,
-                            location: market.location,
-                          },
-                        }}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
+                <ProductGrid
+                  products={marketProducts}
+                  onProductSelect={handleProductSelect}
+                />
               )}
             </motion.div>
           </div>
         </section>
+
+        {/* Product Details Modal */}
+        {selectedProduct && (
+          <ProductDetailsModal
+            isOpen={!!selectedProduct}
+            onClose={handleCloseModal}
+            product={selectedProduct as ModalProduct}
+          />
+        )}
       </div>
     </PageTransition>
   );

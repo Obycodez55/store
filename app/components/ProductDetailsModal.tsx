@@ -5,9 +5,9 @@ import { Dialog } from "@headlessui/react";
 import { Button } from "@/components/ui/button";
 import { X, Copy, MapPin, Phone, Mail, Globe, Store } from "lucide-react";
 import { toast } from "sonner";
-import Image from 'next/image';
+import Image from "next/image";
 
-export interface ModalProduct{
+export interface ModalProduct {
   name: string;
   description: string;
   price: number;
@@ -24,15 +24,15 @@ export interface ModalProduct{
     };
   };
 }
- interface ProductDetailsModalProps {
+interface ProductDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  product: ModalProduct
+  product: ModalProduct;
 }
 
 const backdropVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1 }
+  visible: { opacity: 1 },
 };
 
 const modalVariants = {
@@ -44,17 +44,17 @@ const modalVariants = {
     transition: {
       type: "spring",
       duration: 0.5,
-      bounce: 0.3
-    }
+      bounce: 0.3,
+    },
   },
   exit: {
     opacity: 0,
     y: 20,
     scale: 0.95,
     transition: {
-      duration: 0.2
-    }
-  }
+      duration: 0.2,
+    },
+  },
 };
 
 const copyToClipboard = (text: string, label: string) => {
@@ -65,7 +65,7 @@ const copyToClipboard = (text: string, label: string) => {
 export const ProductDetailsModal = ({
   isOpen,
   onClose,
-  product
+  product,
 }: ProductDetailsModalProps) => {
   return (
     <AnimatePresence>
@@ -87,65 +87,63 @@ export const ProductDetailsModal = ({
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 flex items-center justify-center p-4">
+          <div className="fixed inset-0 flex justify-center items-center p-4">
             <Dialog.Panel>
               <motion.div
                 variants={modalVariants}
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className="relative bg-card rounded-lg shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto"
+                className="relative bg-card shadow-lg rounded-lg w-full max-w-lg md:max-w-xl lg:max-w-2xl max-h-[90vh] overflow-y-auto"
               >
                 {/* Close button */}
                 <button
                   onClick={onClose}
-                  className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors"
+                  className="top-4 right-4 z-10 absolute text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="w-5 h-5" />
                 </button>
 
                 {/* Product image */}
-                <div className="relative h-48 md:h-64 w-full">
-                  <Image 
-                    src={product.image} 
+                <div className="relative w-full h-48 md:h-72 lg:h-96">
+                  <Image
+                    src={product.image}
                     alt={product.name}
-                    width={400}
-                    height={400}
-                    className="w-full h-full object-cover rounded-t-lg"
+                    width={800}
+                    height={800}
+                    className="rounded-t-lg w-full h-full object-cover"
+                    priority
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <h3 className="text-xl font-display font-bold">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  <div className="bottom-6 left-6 absolute text-white">
+                    <h3 className="font-bold font-display text-xl md:text-2xl lg:text-3xl">
                       {product.name}
                     </h3>
-                    <p className="text-white/80 text-sm">
-                      ${product.price.toFixed(2)}
-                    </p>
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-6 space-y-6">
+                <div className="space-y-6 p-6 md:p-8">
                   {/* Vendor section */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-primary">
-                      <Store className="h-5 w-5" />
+                      <Store className="w-5 h-5" />
                       <h4 className="font-display font-semibold">
                         Vendor Details
                       </h4>
                     </div>
 
                     <div className="space-y-3">
-                      <p className="text-lg font-semibold">
+                      <p className="font-semibold text-lg">
                         {product.vendor.name}
                       </p>
 
                       {/* Contact details */}
                       <div className="space-y-2">
                         {product.vendor.email && (
-                          <div className="flex items-center justify-between group">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Mail className="h-4 w-4" />
+                          <div className="flex justify-between items-center group">
+                            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                              <Mail className="w-4 h-4" />
                               <span>{product.vendor.email}</span>
                             </div>
                             <Button
@@ -156,15 +154,15 @@ export const ProductDetailsModal = ({
                               }
                               className="opacity-0 group-hover:opacity-100 transition-opacity"
                             >
-                              <Copy className="h-4 w-4" />
+                              <Copy className="w-4 h-4" />
                             </Button>
                           </div>
                         )}
 
                         {product.vendor.phone && (
-                          <div className="flex items-center justify-between group">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Phone className="h-4 w-4" />
+                          <div className="flex justify-between items-center group">
+                            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                              <Phone className="w-4 h-4" />
                               <span>{product.vendor.phone}</span>
                             </div>
                             <Button
@@ -175,15 +173,15 @@ export const ProductDetailsModal = ({
                               }
                               className="opacity-0 group-hover:opacity-100 transition-opacity"
                             >
-                              <Copy className="h-4 w-4" />
+                              <Copy className="w-4 h-4" />
                             </Button>
                           </div>
                         )}
 
                         {product.vendor.website && (
-                          <div className="flex items-center justify-between group">
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Globe className="h-4 w-4" />
+                          <div className="flex justify-between items-center group">
+                            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                              <Globe className="w-4 h-4" />
                               <a
                                 href={product.vendor.website}
                                 target="_blank"
@@ -204,7 +202,7 @@ export const ProductDetailsModal = ({
                               }
                               className="opacity-0 group-hover:opacity-100 transition-opacity"
                             >
-                              <Copy className="h-4 w-4" />
+                              <Copy className="w-4 h-4" />
                             </Button>
                           </div>
                         )}
@@ -215,7 +213,7 @@ export const ProductDetailsModal = ({
                   {/* Market location */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-primary">
-                      <MapPin className="h-5 w-5" />
+                      <MapPin className="w-5 h-5" />
                       <h4 className="font-display font-semibold">
                         Market Location
                       </h4>
@@ -225,8 +223,8 @@ export const ProductDetailsModal = ({
                       <p className="font-medium">
                         {product.vendor.market.name}
                       </p>
-                      <div className="flex items-center justify-between group">
-                        <p className="text-sm text-muted-foreground">
+                      <div className="flex justify-between items-center group">
+                        <p className="text-muted-foreground text-sm">
                           {product.vendor.market.location}
                         </p>
                         <Button
@@ -240,7 +238,7 @@ export const ProductDetailsModal = ({
                           }
                           className="opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                          <Copy className="h-4 w-4" />
+                          <Copy className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>

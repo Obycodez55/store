@@ -194,7 +194,7 @@ const Auth = () => {
           >
             <div className="space-y-2">
               <h1 className="bg-clip-text bg-gradient-to-r from-white to-white/70 font-bold font-display text-3xl text-transparent md:text-4xl">
-                Welcome to MarketPlace
+                Welcome to Ibadan MarketPlace
               </h1>
               <p className="max-w-md text-lg text-white/60 leading-relaxed">
                 Connect with local markets, discover fresh produce, and support
@@ -210,7 +210,7 @@ const Auth = () => {
               transition={{ delay: 0.7 }}
             >
               {[
-                "Discover local markets near you",
+                "Discover local markets In Ibadan",
                 "Connect with trusted vendors",
                 "Access fresh, quality products",
                 "Support your local community",
@@ -329,7 +329,7 @@ const Auth = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="website">Website</Label>
+                        <Label htmlFor="website">Website(optional)</Label>
                         <div className="relative">
                           <Input
                             id="website"

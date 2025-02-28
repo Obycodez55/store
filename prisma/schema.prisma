@@ -61,8 +61,9 @@ model Market {
   description String
   image       String
   location    String
-  prevDate    DateTime
-  nextDate    DateTime
+  prevDate    DateTime?      
+  nextDate    DateTime?
+  interval    String         @default("DAILY")
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
   images      MarketImages[]
@@ -93,7 +94,7 @@ model Vendor {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   email     String?
-  phone     String?
+  phone     String
   website   String?
   goodsSold String[]
   products  Product[]
@@ -106,7 +107,6 @@ model Product {
   name        String
   description String?
   image       String?
-  price       Float
   vendorId    String
   tags        Tags[]
   createdAt   DateTime @default(now())

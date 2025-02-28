@@ -6,14 +6,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Phone, LogOut, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 
 export function UserMenu() {
   const { data: session } = useSession();
-
+  console.log({ session });
   if (!session?.user) {
     return (
       <Link href="/auth">
@@ -26,14 +26,15 @@ export function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2">
-          <Phone className="h-4 w-4" />
-          <span>{session.user.phone}</span>
+          {/* <Phone className="w-4 h-4" /> */}
+          <User className="w-4 h-4" />
+          <span>{session.user.name.split(" ")[0]}</span>{" "}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
           <Link href="/dashboard" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
+            <User className="w-4 h-4" />
             Dashboard
           </Link>
         </DropdownMenuItem>
@@ -41,7 +42,7 @@ export function UserMenu() {
           className="flex items-center gap-2 text-destructive"
           onClick={() => signOut()}
         >
-          <LogOut className="h-4 w-4" />
+          <LogOut className="w-4 h-4" />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
