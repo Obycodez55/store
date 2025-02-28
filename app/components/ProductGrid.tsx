@@ -1,7 +1,6 @@
 "use client";
 
 import { Product } from "@/types/market";
-import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { formatPrice } from "@/lib/utils";
 

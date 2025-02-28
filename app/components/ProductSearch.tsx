@@ -9,9 +9,7 @@ import { useProductSearch } from "@/app/hooks/useProductSearch";
 import { Product } from "@/types/market";
 import debounce from "lodash/debounce";
 import { useOnClickOutside } from "../hooks/useOnClickOutside";
-import Image from "next/image";
 import { ProductGrid } from "./ProductGrid";
-import { ProductCard } from "@/app/components/ProductCard";
 
 interface ProductSearchProps {
   onProductSelect: (product: Product) => void;

@@ -8,7 +8,7 @@ import { Market } from "@/types/market";
 import { UserMenu } from "./UserMenu";
 import Link from "next/link";
 
-export default function Header({ markets = [] }) {
+export default function Header({ markets = [] }: { markets: Market[] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
 

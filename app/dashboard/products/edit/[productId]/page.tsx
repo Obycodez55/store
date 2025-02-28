@@ -19,18 +19,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export default function EditProduct({
-  params,
-}: {
-  params: { productId: string };
-}) {
+export default function EditProduct({ params }: { params: any }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | Blob | null>(null);
   const [selectedTag, setSelectedTag] = useState<Tags>(Tags.OTHER);
   const [product, setProduct] = useState<Product | null>(null);
   const [imageChanged, setImageChanged] = useState(false);
-
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -41,6 +36,7 @@ export default function EditProduct({
         setImagePreview(data.image);
         setSelectedTag(data.tags[0] || Tags.OTHER);
       } catch (error) {
+        console.error(error);
         toast.error("Failed to fetch product");
         router.push("/dashboard");
       }
@@ -71,6 +67,7 @@ export default function EditProduct({
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
+      console.error(error);
       toast.error("Failed to update product");
     } finally {
       setIsLoading(false);
@@ -82,7 +79,7 @@ export default function EditProduct({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result);
+        setImagePreview(reader.result as string);
         setImageChanged(true);
       };
       reader.readAsDataURL(file);

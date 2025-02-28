@@ -1,16 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
-import { Store, Package, Plus, X } from "lucide-react";
+import { Store, Package, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import { PageTransition } from "@/app/components/PageTransition";
 import Link from "next/link";
 import { ProductCard } from "@/app/components/ProductCard";
+import { Product } from "@prisma/client";
 
 interface VendorDashboardData {
   id: string;
@@ -36,8 +34,6 @@ interface VendorDashboardData {
 
 export default function Dashboard() {
   const { data: session } = useSession();
-  const [newItem, setNewItem] = useState("");
-
   const { data: vendorData, refetch } = useQuery<VendorDashboardData>({
     queryKey: ["vendor-dashboard"],
     queryFn: async () => {
@@ -47,44 +43,44 @@ export default function Dashboard() {
     },
   });
 
-  const handleAddItem = async () => {
-    if (!newItem.trim()) return;
+  // const handleAddItem = async () => {
+  //   if (!newItem.trim()) return;
 
-    try {
-      const response = await fetch("/api/vendor/goods", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ item: newItem.trim() }),
-      });
+  //   try {
+  //     const response = await fetch("/api/vendor/goods", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ item: newItem.trim() }),
+  //     });
 
-      if (!response.ok) throw new Error("Failed to add item");
+  //     if (!response.ok) throw new Error("Failed to add item");
 
-      toast.success("Item added successfully");
-      setNewItem("");
-      refetch();
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to add item");
-    }
-  };
+  //     toast.success("Item added successfully");
+  //     setNewItem("");
+  //     refetch();
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error("Failed to add item");
+  //   }
+  // };
 
-  const handleRemoveItem = async (item: string) => {
-    try {
-      const response = await fetch("/api/vendor/goods", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ item }),
-      });
+  // const handleRemoveItem = async (item: string) => {
+  //   try {
+  //     const response = await fetch("/api/vendor/goods", {
+  //       method: "DELETE",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ item }),
+  //     });
 
-      if (!response.ok) throw new Error("Failed to remove item");
+  //     if (!response.ok) throw new Error("Failed to remove item");
 
-      toast.success("Item removed successfully");
-      refetch();
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to remove item");
-    }
-  };
+  //     toast.success("Item removed successfully");
+  //     refetch();
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast.error("Failed to remove item");
+  //   }
+  // };
 
   if (!session?.user) {
     return null;
@@ -218,7 +214,7 @@ export default function Dashboard() {
                 {vendorData?.products?.map((product) => (
                   <ProductCard
                     key={product.id}
-                    product={product}
+                    product={product as any}
                     isManageable
                     onDelete={() => refetch()}
                   />

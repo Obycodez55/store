@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { v2 as cloudinary } from "cloudinary";
+import { Tags } from "@prisma/client";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -12,10 +13,10 @@ cloudinary.config({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { productId: string } }
-) {
-  params = await params;
+  { params }: { params: any }
+): Promise<NextResponse> {
   try {
+    params = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -73,8 +74,7 @@ export async function PUT(request: NextRequest, { params }: any) {
 
     // Upload new image if provided
     let imageUrl = existingProduct.image;
-    const image = formData.get("image");
-    let imageFile = formData.get("image") as string;
+    const imageFile = formData.get("image") as string;
     // Handle image upload
     // Check if the image is a base64 string
     // * NB: imageFile starts with data:
@@ -86,7 +86,7 @@ export async function PUT(request: NextRequest, { params }: any) {
 
     // Get tag from form data
     const tag = formData.get("tag");
-    const tags = tag ? [tag as string] : existingProduct.tags;
+    const tags = tag ? [tag as Tags] : existingProduct.tags;
 
     // Update product
     const product = await prisma.product.update({
@@ -109,7 +109,7 @@ export async function PUT(request: NextRequest, { params }: any) {
 // DELETE /api/products/[productId] - Delete a product
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { productId: string } }
+  { params }: { params: any }
 ) {
   params = await params;
   try {

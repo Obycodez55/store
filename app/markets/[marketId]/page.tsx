@@ -6,10 +6,8 @@ import { getMarketDays } from "@/app/utils/getMarketDays";
 import moment from "moment";
 import { subscribe } from "@/app/utils/subscribe";
 import { MarketDaysDisplay } from "@/app/components/MarketDays";
-import { ProductCard } from "@/app/components/ProductCard";
 import { MapPin, Calendar, Info, Package } from "lucide-react";
 import { PageTransition } from "@/app/components/PageTransition";
-import { UserMenu } from "@/app/components/UserMenu";
 import ProductCardSkeleton from "@/app/components/ProductCardSkeleton";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
@@ -19,18 +17,6 @@ import {
   ProductDetailsModal,
 } from "@/app/components/ProductDetailsModal";
 import { Product } from "@/types/market";
-
-// Animation variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
-  },
-};
 
 const itemVariants = {
   hidden: { y: 20, opacity: 0 },
@@ -62,10 +48,6 @@ const Market = () => {
     retry: false, // Prevent infinite retries
     refetchOnWindowFocus: false, // Prevent unnecessary refetches
   });
-
-  useEffect(() => {
-    console.log({ market });
-  }, [market]);
 
   const productsLoading = false;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -139,7 +121,6 @@ const Market = () => {
     // Use current date if the dates are invalid (1970)
 
     const prevDate = market.prevDate && new Date(market.prevDate);
-    const nextDate = market.nextDate && new Date(market.nextDate);
 
     // if (useCurrentDate) {
     //   const today = new Date();

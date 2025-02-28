@@ -2,10 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { Market } from "@/types/market";
-
-// Dynamically import the Header to avoid SSR issues with authentication state
-const Header = dynamic(() => import("./Header"), { ssr: false });
-
+import Header from "@/app/components/Header";
 export default function HeaderClientWrapper({
   initialMarkets = [],
 }: {

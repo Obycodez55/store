@@ -17,13 +17,14 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { PageTransition } from "@/app/components/PageTransition";
-import Link from "next/link";
 import { Tags } from "@prisma/client";
 
 export default function AddProduct() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [imagePreview, setImagePreview] = useState<Blob | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | ArrayBuffer | null>(
+    null
+  );
   const [selectedTag, setSelectedTag] = useState<Tags>(Tags.OTHER);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -34,7 +35,7 @@ export default function AddProduct() {
       const formData = new FormData(e.currentTarget);
       formData.append("tag", selectedTag);
       // for file upload (Blob is better than File, since this is exactly base64 )
-      formData.append("image", imagePreview as Blob);
+      formData.append("image", imagePreview as string);
       const response = await fetch("/api/products", {
         method: "POST",
         body: formData,
@@ -49,6 +50,7 @@ export default function AddProduct() {
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
+      console.error(error);
       toast.error("Failed to add product");
     } finally {
       setIsLoading(false);
@@ -170,7 +172,7 @@ export default function AddProduct() {
                   />
                   {imagePreview ? (
                     <img
-                      src={imagePreview}
+                      src={imagePreview as string}
                       alt="Preview"
                       className="w-full h-full object-contain"
                     />

@@ -2,10 +2,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MarketCard from "./components/MarketCard";
-import { useRouter } from "next/navigation";
 import { SuggestMarketModal } from "./components/MarketSuggestModal";
 import { useMarkets } from "./hooks/useMarkets";
-import { Market } from "@/types/market";
 import { PageTransition } from "./components/PageTransition";
 import { LoadingGrid } from "./components/LoadingGrid";
 
@@ -45,11 +43,6 @@ type MarketData = {
 export default function Home() {
   const { data: markets, isLoading: marketsIsLoading } = useMarkets();
   const [showSuggestionModal, setShowSuggestionModal] = useState(false);
-  const router = useRouter();
-
-  const handleMarketSelect = (market: Market) => {
-    router.push(`/markets/${market.id}`);
-  };
 
   const handleSubmitMarket = (marketData: MarketData) => {
     console.log(marketData);

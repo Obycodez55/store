@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const tag = formData.get("tag") as Tags;
-    const imageFile = formData.get("image") as Blob | null;
+    const imageFile = formData.get("image") as string | null;
 
     console.log({ session, name, description, tag, imageFile });
     // return NextResponse.json({ message: "Failed" }, { status: 401 });
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle image upload
-    let imageUrl = null;
+    let imageUrl: string | null = null;
     // Check if the image is a base64 string
     // * NB: imageFile starts with "data:" so acceptable to upload directly
     // Use the base64 data URI directly

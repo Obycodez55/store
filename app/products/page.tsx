@@ -21,7 +21,7 @@ function ProductsPageContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const { data, isLoading } = useProductSearch(searchQuery, currentPage);
+  const { data } = useProductSearch(searchQuery, currentPage);
   const products = useMemo(() => data?.products || [], [data?.products]);
   const pagination = data?.pagination;
 
