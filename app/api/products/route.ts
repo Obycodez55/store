@@ -20,9 +20,12 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const marketId = searchParams.get("marketId");
-    console.log({ session });
-    const products = await prisma.product.findMany({
-      where: marketId
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "12");
+    const query = searchParams.get("q") || "";
+
+    const where = {
+      ...(marketId
         ? {
             vendor: {
               market: {
@@ -30,16 +33,46 @@ export async function GET(req: Request) {
               },
             },
           }
-        : undefined,
-      include: {
-        vendor: {
-          include: {
-            market: true,
+        : {}),
+      ...(query
+        ? {
+            OR: [
+              { name: { contains: query, mode: "insensitive" } },
+              { description: { contains: query, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    };
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          vendor: {
+            include: {
+              market: true,
+            },
           },
+          images: true,
         },
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+      prisma.product.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      products,
+      pagination: {
+        total,
+        pages: Math.ceil(total / limit),
+        page,
+        limit,
       },
     });
-    return NextResponse.json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
     return new NextResponse("Internal error", { status: 500 });
@@ -59,13 +92,13 @@ export async function POST(request: NextRequest) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const tag = formData.get("tag") as Tags;
-    const imageFile = formData.get("image") as string | null;
+    const images = formData.getAll("images") as string[];
 
-    // console.log({ session, name, description, tag, imageFile });
-    // return NextResponse.json({ message: "Failed" }, { status: 401 });
-    if (!imageFile) {
-      console.log([...formData.keys()]);
-      return NextResponse.json({ error: "Image is required" }, { status: 400 });
+    if (!images.length) {
+      return NextResponse.json(
+        { error: "At least one image is required" },
+        { status: 400 }
+      );
     }
     if (!name || !description) {
       return NextResponse.json(
@@ -74,7 +107,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find the vendor associated with the user
     const vendor = await prisma.vendor.findFirst({
       where: { user: { phone: session.user.phone } },
     });
@@ -86,30 +118,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Handle image upload
-    let imageUrl: string | null = null;
-    // Check if the image is a base64 string
-    // * NB: imageFile starts with "data:" so acceptable to upload directly
-    // Use the base64 data URI directly
-    const uploadResult = await cloudinary.uploader.upload(imageFile, {
-      folder: "products",
-    });
-    imageUrl = uploadResult.secure_url;
+    // Upload all images to Cloudinary
+    const uploadPromises = images.map((imageFile) =>
+      cloudinary.uploader.upload(imageFile, {
+        folder: "products",
+      })
+    );
 
-    // Create product
+    const uploadResults = await Promise.all(uploadPromises);
+    const imageUrls = uploadResults.map((result) => result.secure_url);
+
+    // Create product with the first image as primary
     const product = await prisma.product.create({
       data: {
         name,
         description,
         tags: [tag || Tags.OTHER],
-        image: imageUrl,
+        image: imageUrls[0], // Set first image as primary
         vendorId: vendor.id,
+        images: {
+          create: imageUrls.slice(1).map((url) => ({
+            url,
+          })),
+        },
+      },
+      include: {
+        images: true,
+        vendor: {
+          include: {
+            market: true,
+          },
+        },
       },
     });
 
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
-    console.log("Error creating product:", JSON.stringify(error));
+    console.error("Error creating product:", JSON.stringify(error));
     return NextResponse.json(
       { error: "Failed to create product" },
       { status: 500 }

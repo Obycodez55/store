@@ -3,15 +3,27 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Dialog } from "@headlessui/react";
 import { Button } from "@/components/ui/button";
-import { X, Copy, MapPin, Phone, Mail, Globe, Store } from "lucide-react";
+import {
+  X,
+  Copy,
+  MapPin,
+  Phone,
+  Mail,
+  Globe,
+  Store,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { useState } from "react";
 
 export interface ModalProduct {
   name: string;
   description: string;
   price: number;
   image: string;
+  images: { id: string; url: string }[];
   tags: string[];
   vendor: {
     name: string;
@@ -67,6 +79,22 @@ export const ProductDetailsModal = ({
   onClose,
   product,
 }: ProductDetailsModalProps) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const allImages = [
+    product.image,
+    ...product.images.map((img) => img.url),
+  ].filter(Boolean);
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? allImages.length - 1 : prev - 1
+    );
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -104,23 +132,73 @@ export const ProductDetailsModal = ({
                   <X className="w-5 h-5" />
                 </button>
 
-                {/* Product image */}
+                {/* Product image carousel */}
                 <div className="relative w-full h-48 md:h-72 lg:h-96">
                   <Image
-                    src={product.image}
-                    alt={product.name}
+                    src={allImages[currentImageIndex]}
+                    alt={`${product.name} - Image ${currentImageIndex + 1}`}
                     width={800}
                     height={800}
                     className="rounded-t-lg w-full h-full object-cover"
                     priority
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+
+                  {/* Navigation arrows */}
+                  {allImages.length > 1 && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={prevImage}
+                        className="top-1/2 left-2 absolute bg-black/20 hover:bg-black/40 -translate-y-1/2"
+                      >
+                        <ChevronLeft className="w-6 h-6 text-white" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={nextImage}
+                        className="top-1/2 right-2 absolute bg-black/20 hover:bg-black/40 -translate-y-1/2"
+                      >
+                        <ChevronRight className="w-6 h-6 text-white" />
+                      </Button>
+                    </>
+                  )}
+
+                  {/* Image counter */}
+                  <div className="top-4 left-4 absolute bg-black/50 px-2 py-1 rounded text-sm text-white">
+                    {currentImageIndex + 1} / {allImages.length}
+                  </div>
+
+                  {/* Product name */}
                   <div className="bottom-6 left-6 absolute text-white">
                     <h3 className="font-bold font-display text-xl md:text-2xl lg:text-3xl">
                       {product.name}
                     </h3>
                   </div>
                 </div>
+
+                {/* Image thumbnails */}
+                {allImages.length > 1 && (
+                  <div className="right-0 -bottom-12 left-0 absolute">
+                    <div className="flex justify-center gap-2 px-4">
+                      <div className="flex gap-2 bg-black/50 p-2 rounded-full">
+                        {allImages.map((img, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setCurrentImageIndex(index)}
+                            className={`w-2 h-2 rounded-full transition-all ${
+                              index === currentImageIndex
+                                ? "bg-white scale-125"
+                                : "bg-white/50 hover:bg-white/75"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Content */}
                 <div className="space-y-6 p-6 md:p-8">

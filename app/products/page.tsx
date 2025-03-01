@@ -12,7 +12,7 @@ import {
 } from "../components/ProductDetailsModal";
 import { useProductSearch } from "../hooks/useProductSearch";
 import { Product } from "@/types/market";
-import { Package, Store } from "lucide-react";
+import { Package } from "lucide-react";
 import { LoadingScreen } from "@/app/components/LoadingScreen";
 import { useMarkets } from "../hooks/useMarkets";
 import {

@@ -1,36 +1,25 @@
-const ProductCardSkeleton = () => (
-  <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
-    {/* Image skeleton */}
-    <div className="h-48 bg-muted animate-pulse" />
+export function ProductCardSkeleton() {
+  return (
+    <div className="bg-card border rounded-lg overflow-hidden">
+      <div className="relative aspect-square">
+        {/* Image skeleton */}
+        <div className="bg-muted w-full h-full animate-pulse" />
 
-    {/* Content skeleton */}
-    <div className="p-4 space-y-4">
-      {/* Title and price */}
-      <div className="flex items-center justify-between">
-        <div className="h-6 bg-muted rounded w-2/3 animate-pulse" />
-        <div className="h-6 bg-muted rounded w-16 animate-pulse" />
+        {/* Multiple images indicator skeleton */}
+        <div className="top-2 right-2 absolute bg-muted rounded-full w-16 h-6 animate-pulse" />
       </div>
+      <div className="space-y-2 p-4">
+        {/* Title skeleton */}
+        <div className="bg-muted rounded w-3/4 h-4 animate-pulse" />
 
-      {/* Description */}
-      <div className="space-y-2">
-        <div className="h-4 bg-muted rounded w-full animate-pulse" />
-        <div className="h-4 bg-muted rounded w-4/5 animate-pulse" />
-      </div>
-
-      {/* Tags */}
-      <div className="flex flex-wrap gap-2">
-        <div className="h-6 w-16 bg-muted rounded-full animate-pulse" />
-        <div className="h-6 w-20 bg-muted rounded-full animate-pulse" />
-        <div className="h-6 w-14 bg-muted rounded-full animate-pulse" />
-      </div>
-
-      {/* Vendor */}
-      <div className="flex items-center gap-2">
-        <div className="h-4 w-4 bg-muted rounded animate-pulse" />
-        <div className="h-4 w-32 bg-muted rounded animate-pulse" />
+        {/* Description skeleton */}
+        <div className="space-y-1">
+          <div className="bg-muted rounded w-full h-3 animate-pulse" />
+          <div className="bg-muted rounded w-4/5 h-3 animate-pulse" />
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+}
 
 export default ProductCardSkeleton;

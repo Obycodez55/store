@@ -12,27 +12,33 @@ interface SearchResponse {
   };
 }
 
-export function useProductSearch(query: string, page = 1, marketId?: string) {
-  return useQuery<SearchResponse>({
-    queryKey: ["products", "search", query, page, marketId],
+export function useProductSearch(
+  searchQuery?: string,
+  page?: number,
+  marketId?: string
+) {
+  const queryKey = ["products", searchQuery, page, marketId];
+
+  return useQuery({
+    queryKey,
     queryFn: async () => {
-      try {
-        const response = await axios.get(`/api/products/search`, {
-          params: {
-            q: query,
-            page,
-            limit: 20,
-            marketId,
-          },
-        });
-        return response.data;
-      } catch (error) {
-        console.error("Product search error:", error);
-        throw error;
-      }
+      const searchParams = new URLSearchParams();
+      if (searchQuery) searchParams.set("q", searchQuery);
+      if (page) searchParams.set("page", String(page));
+      if (marketId) searchParams.set("marketId", marketId);
+
+      const response = await fetch(`/api/products?${searchParams.toString()}`);
+      if (!response.ok) throw new Error("Failed to fetch products");
+
+      const products = await response.json();
+      return products;
     },
-    retry: 1,
-    refetchOnWindowFocus: false,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    select: (data) => ({
+      ...data,
+      products: data.products.map((product: any) => ({
+        ...product,
+        images: product.images || [], // Ensure images is always an array
+      })),
+    }),
   });
 }

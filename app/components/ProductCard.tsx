@@ -4,12 +4,20 @@ import React from "react";
 import { Product } from "@prisma/client";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Images } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 interface ProductCardProps {
-  product: Product;
+  product: Product & {
+    images: { id: string; url: string }[];
+    vendor?: {
+      name: string;
+      market?: {
+        name: string;
+      };
+    };
+  };
   isManageable?: boolean;
   onEdit?: (product: Product) => void;
   onDelete?: (productId: string) => void;
@@ -51,11 +59,19 @@ export function ProductCard({
     <Card className="overflow-hidden">
       <div className="relative aspect-square">
         {product.image ? (
-          <img
-            src={product.image}
-            alt={product.name}
-            className="aspect-2 object-cover"
-          />
+          <>
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-full aspect-square object-cover"
+            />
+            {product.images?.length > 0 && (
+              <div className="top-2 right-2 absolute flex items-center gap-1 bg-black/50 px-2 py-1 rounded-full text-white text-xs">
+                <Images className="w-3 h-3" />
+                <span>{product.images.length + 1}</span>
+              </div>
+            )}
+          </>
         ) : (
           <div className="flex justify-center items-center bg-muted/50 w-full h-full">
             No image
