@@ -22,7 +22,7 @@ export default function Header({ markets = [] }: { markets: Market[] }) {
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="top-0 z-50 sticky bg-card shadow-sm border-b border-border w-full"
+      className="relative top-0 z-50 sticky bg-card shadow-sm border-b border-border w-full"
     >
       {/* Desktop Navigation */}
       <div className="md:flex justify-between items-center hidden mx-auto px-6 py-4 w-full max-w-7xl">

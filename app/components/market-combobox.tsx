@@ -70,7 +70,7 @@ export function MarketComboBox({
                 return (
                   <CommandItem
                     key={market.id}
-                    value={market.id}
+                    value={market.name}
                     onSelect={() => {
                       onSelect(market.id);
                       setOpen(false);
