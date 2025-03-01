@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     const tag = formData.get("tag") as Tags;
     const imageFile = formData.get("image") as string | null;
 
-    console.log({ session, name, description, tag, imageFile });
+    // console.log({ session, name, description, tag, imageFile });
     // return NextResponse.json({ message: "Failed" }, { status: 401 });
     if (!imageFile) {
       console.log([...formData.keys()]);
