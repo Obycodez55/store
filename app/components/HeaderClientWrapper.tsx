@@ -1,12 +1,13 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { Market } from "@/types/market";
 import Header from "@/app/components/Header";
+import { useMarkets } from "@/app/hooks/useMarkets";
 export default function HeaderClientWrapper({
   initialMarkets = [],
 }: {
   initialMarkets: Market[];
 }) {
-  return <Header markets={initialMarkets} />;
+  const { data: markets } = useMarkets();
+  return <Header markets={markets || initialMarkets} />;
 }

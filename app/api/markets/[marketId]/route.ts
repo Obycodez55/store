@@ -1,11 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  { params }: any
-) {
+export async function GET(request: NextRequest, { params }: { params: any }) {
   try {
+    params = await params;
     const marketId = params.marketId;
     console.log("Fetching market with ID:", marketId); // Debug log
 

@@ -12,10 +12,10 @@ interface ProductPaginationProps {
 export const ProductPagination = ({
   currentPage,
   totalPages,
-  onPageChange
+  onPageChange,
 }: ProductPaginationProps) => {
   const getPageNumbers = () => {
-    const pages = [];
+    const pages: number[] = [];
     const maxVisiblePages = 5;
 
     if (totalPages <= maxVisiblePages) {
@@ -51,7 +51,7 @@ export const ProductPagination = ({
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
       >
-        <ChevronLeft className="h-4 w-4" />
+        <ChevronLeft className="w-4 h-4" />
       </Button>
 
       {getPageNumbers().map((pageNum, idx) =>
@@ -77,7 +77,7 @@ export const ProductPagination = ({
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
       >
-        <ChevronRight className="h-4 w-4" />
+        <ChevronRight className="w-4 h-4" />
       </Button>
     </div>
   );
