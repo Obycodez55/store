@@ -13,11 +13,6 @@ cloudinary.config({
 
 export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
     const { searchParams } = new URL(req.url);
     const marketId = searchParams.get("marketId");
     const page = parseInt(searchParams.get("page") || "1");
