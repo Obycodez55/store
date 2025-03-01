@@ -2,10 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ImagePlus, ArrowLeft } from "lucide-react";
+import { ImagePlus, ArrowLeft, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
+import { PageTransition } from "@/app/components/PageTransition";
+import { Tags } from "@prisma/client";
 import {
   Select,
   SelectContent,
@@ -13,19 +18,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
-import { PageTransition } from "@/app/components/PageTransition";
-import { Tags } from "@prisma/client";
 
 export default function AddProduct() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | ArrayBuffer | null>(
-    null
-  );
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [selectedTag, setSelectedTag] = useState<Tags>(Tags.OTHER);
+  const router = useRouter();
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviews((prev) => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index: number) => {
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,37 +48,32 @@ export default function AddProduct() {
     try {
       const formData = new FormData(e.currentTarget);
       formData.append("tag", selectedTag);
-      // for file upload (Blob is better than File, since this is exactly base64 )
-      formData.append("image", imagePreview as string);
+
+      // Add all image previews
+      imagePreviews.forEach((preview) => {
+        formData.append("images", preview);
+      });
+
+      if (imagePreviews.length === 0) {
+        toast.error("At least one image is required");
+        return;
+      }
+
       const response = await fetch("/api/products", {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Failed to add product");
+      if (!response.ok) throw new Error("Failed to create product");
 
-      const result = await response.json();
-      console.log({ result });
-
-      toast.success("Product added successfully");
+      toast.success("Product created successfully");
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to add product");
+      toast.error("Failed to create product");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file as Blob);
     }
   };
 
@@ -150,7 +159,7 @@ export default function AddProduct() {
                     Cancel
                   </Button>
                   <Button type="submit" disabled={isLoading}>
-                    {isLoading ? "Adding..." : "Add Product"}
+                    {isLoading ? "Creating..." : "Create Product"}
                   </Button>
                 </div>
               </form>
@@ -160,37 +169,61 @@ export default function AddProduct() {
           {/* Image Upload Card */}
           <Card>
             <CardContent className="p-6">
-              <h2 className="mb-4 font-medium text-lg">Product Image</h2>
-              <div className="relative">
-                <div className="flex justify-center items-center border-2 hover:border-primary/50 bg-muted/50 p-4 border-dashed rounded-lg transition cursor-pointer aspect-square">
-                  <input
-                    type="file"
-                    name="image"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-                  />
-                  {imagePreview ? (
-                    <img
-                      src={imagePreview as string}
-                      alt="Preview"
-                      className="w-full h-full object-contain"
+              <h2 className="mb-4 font-medium text-lg">Product Images</h2>
+              <div className="space-y-4">
+                <div className="relative">
+                  <div className="flex justify-center items-center border-2 hover:border-primary/50 bg-muted/50 p-4 border-dashed rounded-lg transition cursor-pointer aspect-square">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageChange}
+                      className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
                     />
-                  ) : (
                     <div className="text-center">
                       <ImagePlus className="mx-auto w-12 h-12 text-muted-foreground" />
                       <p className="mt-2 text-muted-foreground text-sm">
-                        Click or drag to upload product image
+                        Click or drag to upload product images
                       </p>
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-              <div className="mt-4">
-                <p className="text-muted-foreground text-sm">
-                  Upload a high-quality image of your product. Recommended size:
-                  1000x1000px.
-                </p>
+
+                {/* Image Previews */}
+                {imagePreviews.length > 0 && (
+                  <div className="gap-2 grid grid-cols-2">
+                    {imagePreviews.map((preview, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={preview}
+                          alt={`Preview ${index + 1}`}
+                          className="rounded-md w-full aspect-square object-cover"
+                        />
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="top-2 right-2 absolute opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => removeImage(index)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                        {index === 0 && (
+                          <span className="bottom-2 left-2 absolute bg-black/50 px-2 py-1 rounded text-white text-xs">
+                            Primary
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-4">
+                  <p className="text-muted-foreground text-sm">
+                    Upload high-quality images of your product. The first image
+                    will be used as the primary image. Recommended size:
+                    1000x1000px.
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

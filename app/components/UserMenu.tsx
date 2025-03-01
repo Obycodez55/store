@@ -13,7 +13,7 @@ import { LogOut, User } from "lucide-react";
 
 export function UserMenu() {
   const { data: session } = useSession();
-  console.log({ session });
+
   if (!session?.user) {
     return (
       <Link href="/auth">
@@ -26,9 +26,10 @@ export function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2">
-          {/* <Phone className="w-4 h-4" /> */}
           <User className="w-4 h-4" />
-          <span>{session.user.name.split(" ")[0]}</span>{" "}
+          <span>
+            {session.user.shopName || session.user.name?.split(" ")[0]}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

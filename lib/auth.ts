@@ -44,6 +44,7 @@ export const authOptions: AuthOptions = {
           phone: user.phone,
           image: user.image,
           vendorId: user.vendorId,
+          shopName: user.shopName,
         };
       },
     }),
@@ -57,13 +58,15 @@ export const authOptions: AuthOptions = {
       if (user) {
         token.phone = (user as User & { phone: string }).phone;
         token.vendorId = (user as User & { vendorId: string | null }).vendorId;
+        token.shopName = (user as User & { shopName: string }).shopName;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user.phone = token.phone as string;
-        session.user.vendorId = token.vendorId;
+        session.user.vendorId = token.vendorId as string;
+        session.user.shopName = token.shopName as string;
       }
       return session;
     },

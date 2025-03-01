@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, phone, password, marketId, website } = body;
+    const { name, phone, password, marketId, website, shopName } = body;
 
     if (!phone || !password || !name || !marketId) {
       return NextResponse.json(
@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
           name,
           phone,
           password: hashedPassword,
+          shopName,
           vendorId: vendor.id, // Ensure this is set properly
         },
         include: {
@@ -69,6 +70,7 @@ export async function POST(req: NextRequest) {
           id: result.user.id,
           name: result.user.name,
           phone: result.user.phone,
+          shopName: result.user.shopName,
           vendorId: result.user.vendorId,
         },
         vendor: {
@@ -79,7 +81,7 @@ export async function POST(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Registration error:", error);
+    console.log("Registration error:", JSON.stringify(error));
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

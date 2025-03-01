@@ -3,18 +3,41 @@
 import { Product } from "@/types/market";
 import { Card } from "@/components/ui/card";
 import { formatPrice } from "@/lib/utils";
+import { useState } from "react";
+
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  images: { id: string; url: string }[];
+  vendor: {
+    name: string;
+    market: {
+      name: string;
+    };
+  };
+}
 
 interface ProductGridProps {
   products: Product[];
+  isLoading?: boolean;
+  isManageable?: boolean;
+  onDelete?: (productId: string) => void;
   onProductSelect: (product: Product) => void;
   variant?: "default" | "search";
 }
 
-export const ProductGrid = ({
-  products,
+export function ProductGrid({
+  products = [],
+  isLoading,
+  isManageable,
+  onDelete,
   onProductSelect,
   variant = "default",
-}: ProductGridProps) => {
+}: ProductGridProps) {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
   const gridClass =
     variant === "search"
       ? "gap-3 grid grid-cols-1 sm:grid-cols-2 auto-rows-[minmax(0,15rem)]"
@@ -29,12 +52,20 @@ export const ProductGrid = ({
           onClick={() => onProductSelect(product)}
         >
           <div className="relative aspect-square">
-            {product.image && (
+            {product.images && product.images.length > 0 ? (
               <img
-                src={product.image}
+                src={product.images[0].url}
                 alt={product.name}
                 className="aspect-2 object-cover"
               />
+            ) : (
+              product.image && (
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="aspect-2 object-cover"
+                />
+              )
             )}
           </div>
           <div className="p-4">
@@ -52,4 +83,4 @@ export const ProductGrid = ({
       ))}
     </div>
   );
-};
+}

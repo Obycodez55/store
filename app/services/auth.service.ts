@@ -23,6 +23,7 @@ export const register = async (data: {
   phone: string;
   password: string;
   name: string;
+  shopName: string;
   marketId: string;
   website?: string;
 }) => {

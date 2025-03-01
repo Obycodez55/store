@@ -1,62 +1,55 @@
 import prisma from "@/lib/prisma";
-import { Tags } from "@prisma/client";
 
-export const searchProducts = async (query: string, page: number, limit: number) => {
-    const skip = (page - 1) * limit;
+export async function searchProducts(
+  query: string,
+  page: number,
+  limit: number,
+  marketId?: string
+) {
+  const skip = (page - 1) * limit;
 
-    // Helper function to validate if a string is a valid Tag
-    const isValidTag = (tag: string): tag is Tags => {
-        return Object.values(Tags).includes(tag as Tags);
-    };
-
-    // Filter and validate tags from the query
-    const queryTags = query
-        .split(" ")
-        .filter(isValidTag);
-
-    const products = await prisma.product.findMany({
-        where: {
-            ...(query ? {
-                OR: [
-                    { name: { contains: query, mode: "insensitive" } },
-                    { description: { contains: query, mode: "insensitive" } },
-                    ...(queryTags.length > 0 ? [{ tags: { hasSome: queryTags } }] : []),
-                    { vendor: { name: { contains: query, mode: "insensitive" } } }
-                ]
-            } : {})
-        },
-        include: {
-            vendor: {
-                include: {
-                    market: {
-                        select: {
-                            id: true,
-                            name: true,
-                            location: true
-                        }
-                    }
-                }
-            }
-        },
-        skip,
-        take: limit,
-        orderBy: {
-            createdAt: "desc"
+  // Base query conditions
+  const where = {
+    OR: [
+      { name: { contains: query, mode: "insensitive" } },
+      { description: { contains: query, mode: "insensitive" } },
+    ],
+    vendor: marketId
+      ? {
+          marketId: marketId,
         }
-    });
+      : undefined,
+  };
 
-    const total = await prisma.product.count({
-        where: {
-            ...(query ? {
-                OR: [
-                    { name: { contains: query, mode: "insensitive" } },
-                    { description: { contains: query, mode: "insensitive" } },
-                    ...(queryTags.length > 0 ? [{ tags: { hasSome: queryTags } }] : []),
-                    { vendor: { name: { contains: query, mode: "insensitive" } } }
-                ]
-            } : {})
-        }
-    });
+  // Get total count
+  const total = await prisma.product.count({ where });
 
-    return { products, total };
+  // Get paginated products with vendor and market information
+  const products = await prisma.product.findMany({
+    where,
+    include: {
+      vendor: {
+        select: {
+          name: true,
+          email: true,
+          phone: true,
+          website: true,
+          market: {
+            select: {
+              id: true,
+              name: true,
+              location: true,
+            },
+          },
+        },
+      },
+    },
+    skip,
+    take: limit,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return { products, total };
 }

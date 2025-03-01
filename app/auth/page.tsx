@@ -13,15 +13,18 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Icons } from "../components/Icons";
-import { ArrowLeft, Lock, Eye, EyeOff, User, Phone, Globe } from "lucide-react";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  ArrowLeft,
+  Lock,
+  Eye,
+  EyeOff,
+  User,
+  Phone,
+  Globe,
+  Warehouse,
+} from "lucide-react";
 import Image from "next/image";
+import { MarketComboBox } from "@/app/components/market-combobox";
 
 // Form validation schema
 const loginSchema = z.object({
@@ -45,6 +48,7 @@ const registerSchema = loginSchema
   .extend({
     confirmPassword: z.string(),
     name: z.string().min(2, "Name must be at least 2 characters"),
+    shopName: z.string().min(2, "Shop name must be at least 2 characters"),
     marketId: z.string().min(1, "Please select a market"),
     website: z
       .union([
@@ -85,6 +89,7 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [markets, setMarkets] = useState<{ id: string; name: string }[]>([]);
+  const [isLoadingMarkets, setIsLoadingMarkets] = useState(false);
 
   const form = useForm<AuthFormValues>({
     resolver: zodResolver(isLogin ? loginSchema : registerSchema),
@@ -93,6 +98,7 @@ const Auth = () => {
       password: "",
       confirmPassword: "",
       name: "",
+      shopName: "",
       marketId: "",
       website: "",
     },
@@ -106,14 +112,25 @@ const Auth = () => {
   // Fetch markets for the dropdown
   useEffect(() => {
     const fetchMarkets = async () => {
-      const response = await fetch("/api/markets");
-      const data = await response.json();
-      setMarkets(
-        data.map((market: any) => ({
-          id: market.id,
-          name: market.name,
-        }))
-      );
+      setIsLoadingMarkets(true);
+      try {
+        const response = await fetch("/api/markets");
+        if (!response.ok) throw new Error("Failed to fetch markets");
+        const data = await response.json();
+        setMarkets(
+          data.map((market: any) => ({
+            id: market.id,
+            name: market.name,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching markets:", error);
+        toast.error("Failed to load markets", {
+          description: "Please refresh the page and try again.",
+        });
+      } finally {
+        setIsLoadingMarkets(false);
+      }
     };
 
     if (!isLogin) {
@@ -139,6 +156,7 @@ const Auth = () => {
             phone: data.phone,
             password: data.password,
             name: data.name,
+            shopName: data.shopName,
             marketId: data.marketId,
             website: data.website,
           });
@@ -304,23 +322,37 @@ const Auth = () => {
                       </div>
 
                       <div className="space-y-2">
+                        <Label htmlFor="shopName">Shop Name</Label>
+                        <div className="relative">
+                          <Input
+                            id="shopName"
+                            placeholder="Enter your shop name"
+                            {...form.register("shopName")}
+                            disabled={isLoading}
+                            className="pl-10"
+                          />
+                          <Warehouse className="top-2.5 left-3 absolute w-5 h-5 text-muted-foreground" />
+                        </div>
+                        {form.formState.errors.shopName && (
+                          <p className="text-destructive text-sm">
+                            {form.formState.errors.shopName.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
                         <Label htmlFor="marketId">Select Market</Label>
-                        <Select
-                          onValueChange={(value) =>
-                            form.setValue("marketId", value)
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a market" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {markets.map((market) => (
-                              <SelectItem key={market.id} value={market.id}>
-                                {market.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="relative">
+                          <MarketComboBox
+                            markets={markets}
+                            value={form.watch("marketId")}
+                            onSelect={(value) =>
+                              form.setValue("marketId", value)
+                            }
+                            disabled={isLoading}
+                            isLoading={isLoadingMarkets}
+                          />
+                        </div>
                         {form.formState.errors.marketId && (
                           <p className="text-destructive text-sm">
                             {form.formState.errors.marketId.message}

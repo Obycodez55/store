@@ -130,7 +130,7 @@ export default function Dashboard() {
                   <div>
                     <h3 className="font-medium">{vendorData.name}</h3>
                     <p className="text-muted-foreground text-sm">
-                      {vendorData.email}
+                      {session.user?.shopName}
                     </p>
                   </div>
                   {vendorData.phone && (
