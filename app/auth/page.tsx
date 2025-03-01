@@ -14,14 +14,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Icons } from "../components/Icons";
 import { ArrowLeft, Lock, Eye, EyeOff, User, Phone, Globe } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import Image from "next/image";
+import { MarketComboBox } from "@/app/components/market-combobox";
 
 // Form validation schema
 const loginSchema = z.object({
@@ -85,6 +79,7 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [markets, setMarkets] = useState<{ id: string; name: string }[]>([]);
+  const [isLoadingMarkets, setIsLoadingMarkets] = useState(false);
 
   const form = useForm<AuthFormValues>({
     resolver: zodResolver(isLogin ? loginSchema : registerSchema),
@@ -106,14 +101,25 @@ const Auth = () => {
   // Fetch markets for the dropdown
   useEffect(() => {
     const fetchMarkets = async () => {
-      const response = await fetch("/api/markets");
-      const data = await response.json();
-      setMarkets(
-        data.map((market: any) => ({
-          id: market.id,
-          name: market.name,
-        }))
-      );
+      setIsLoadingMarkets(true);
+      try {
+        const response = await fetch("/api/markets");
+        if (!response.ok) throw new Error("Failed to fetch markets");
+        const data = await response.json();
+        setMarkets(
+          data.map((market: any) => ({
+            id: market.id,
+            name: market.name,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching markets:", error);
+        toast.error("Failed to load markets", {
+          description: "Please refresh the page and try again.",
+        });
+      } finally {
+        setIsLoadingMarkets(false);
+      }
     };
 
     if (!isLogin) {
@@ -305,22 +311,17 @@ const Auth = () => {
 
                       <div className="space-y-2">
                         <Label htmlFor="marketId">Select Market</Label>
-                        <Select
-                          onValueChange={(value) =>
-                            form.setValue("marketId", value)
-                          }
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a market" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {markets.map((market) => (
-                              <SelectItem key={market.id} value={market.id}>
-                                {market.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <div className="relative">
+                          <MarketComboBox
+                            markets={markets}
+                            value={form.watch("marketId")}
+                            onSelect={(value) =>
+                              form.setValue("marketId", value)
+                            }
+                            disabled={isLoading}
+                            isLoading={isLoadingMarkets}
+                          />
+                        </div>
                         {form.formState.errors.marketId && (
                           <p className="text-destructive text-sm">
                             {form.formState.errors.marketId.message}

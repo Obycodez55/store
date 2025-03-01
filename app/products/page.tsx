@@ -12,16 +12,33 @@ import {
 } from "../components/ProductDetailsModal";
 import { useProductSearch } from "../hooks/useProductSearch";
 import { Product } from "@/types/market";
-import { Package } from "lucide-react";
+import { Package, Store } from "lucide-react";
 import { LoadingScreen } from "@/app/components/LoadingScreen";
+import { useMarkets } from "../hooks/useMarkets";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function ProductsPageContent() {
   const searchParams = useSearchParams();
   const [searchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedMarket, setSelectedMarket] = useState<string>("all");
 
-  const { data } = useProductSearch(searchQuery, currentPage);
+  const { data: marketsData } = useMarkets();
+  console.log("Markets data:", marketsData);
+  const markets = marketsData || [];
+
+  const { data } = useProductSearch(
+    searchQuery,
+    currentPage,
+    selectedMarket === "all" ? undefined : selectedMarket
+  );
   const products = useMemo(() => data?.products || [], [data?.products]);
   const pagination = data?.pagination;
 
@@ -60,19 +77,31 @@ function ProductsPageContent() {
       {/* Header */}
       <header className="top-0 z-50 sticky bg-background/80 backdrop-blur-sm border-b w-full">
         <div className="mx-auto px-4 container">
-          <div className="flex justify-between items-center h-16">
-            <motion.a
-              href="/"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="font-bold font-display text-xl"
-            >
-              Market<span className="text-primary">Place</span>
-            </motion.a>
-            <div className="mx-4 w-full max-w-xl">
-              <Suspense fallback={<LoadingScreen />}>
-                <ProductSearch onProductSelect={handleProductSelect} />
-              </Suspense>
+          <div className="flex justify-between items-center md:gap-4 h-16">
+            <div className="flex flex-1 items-center gap-4">
+              <div className="flex-1 max-w-[200px]">
+                <Select
+                  value={selectedMarket}
+                  onValueChange={setSelectedMarket}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Markets" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Markets</SelectItem>
+                    {markets.map((market) => (
+                      <SelectItem key={market.id} value={market.id}>
+                        {market.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex-1">
+                <Suspense fallback={<LoadingScreen />}>
+                  <ProductSearch onProductSelect={handleProductSelect} />
+                </Suspense>
+              </div>
             </div>
           </div>
         </div>
@@ -88,7 +117,11 @@ function ProductsPageContent() {
           <div className="flex items-center gap-2 text-primary">
             <Package className="w-5 h-5" />
             <h1 className="font-display font-semibold text-2xl">
-              Available Products
+              Available Products{" "}
+              {selectedMarket !== "all" &&
+              markets.find((m) => m.id === selectedMarket)?.name
+                ? `in ${markets.find((m) => m.id === selectedMarket)?.name}`
+                : ""}
             </h1>
           </div>
 
