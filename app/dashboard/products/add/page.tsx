@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ImagePlus, ArrowLeft, Trash2 } from "lucide-react";
+import { ImagePlus, ArrowLeft, Trash2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,16 +18,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+// Maximum file size (5MB)
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export default function AddProduct() {
   const [isLoading, setIsLoading] = useState(false);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedTag, setSelectedTag] = useState<Tags>(Tags.OTHER);
   const router = useRouter();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    setErrorMessage(null);
 
+    // Validate file sizes
+    const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
+    if (oversizedFiles.length > 0) {
+      setErrorMessage(
+        `Some images exceed the 5MB size limit: ${oversizedFiles
+          .map((f) => f.name)
+          .join(", ")}`
+      );
+      return;
+    }
+
+    // Store the actual file objects
+    setImageFiles((prev) => [...prev, ...files]);
+
+    // Create previews
     files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -39,6 +61,7 @@ export default function AddProduct() {
 
   const removeImage = (index: number) => {
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -49,29 +72,35 @@ export default function AddProduct() {
       const formData = new FormData(e.currentTarget);
       formData.append("tag", selectedTag);
 
-      // Add all image previews
-      imagePreviews.forEach((preview) => {
-        formData.append("images", preview);
-      });
-
-      if (imagePreviews.length === 0) {
+      if (imageFiles.length === 0) {
         toast.error("At least one image is required");
+        setIsLoading(false);
         return;
       }
+
+      // Add actual image files instead of base64 strings
+      imageFiles.forEach((file, index) => {
+        formData.append("imageFiles", file);
+      });
 
       const response = await fetch("/api/products", {
         method: "POST",
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Failed to create product");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create product");
+      }
 
       toast.success("Product created successfully");
       router.push("/dashboard");
       router.refresh();
     } catch (error) {
       console.error(error);
-      toast.error("Failed to create product");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create product"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -197,6 +226,12 @@ export default function AddProduct() {
           <Card>
             <CardContent className="p-6">
               <h2 className="mb-4 font-medium text-lg">Product Images</h2>
+              {errorMessage && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertCircle className="w-4 h-4" />
+                  <AlertDescription>{errorMessage}</AlertDescription>
+                </Alert>
+              )}
               <div className="space-y-4">
                 <div className="relative">
                   <div className="flex justify-center items-center border-2 hover:border-primary/50 bg-muted/50 p-4 border-dashed rounded-lg transition cursor-pointer aspect-square">
@@ -218,9 +253,9 @@ export default function AddProduct() {
 
                 <div className="mt-4">
                   <p className="text-muted-foreground text-sm">
-                    Upload high-quality images of your product. The first image
-                    will be used as the primary image. Recommended size:
-                    1000x1000px.
+                    Upload high-quality images of your product (max 5MB each).
+                    The first image will be used as the primary image.
+                    Recommended size: 1000x1000px.
                   </p>
                 </div>
               </div>

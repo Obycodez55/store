@@ -92,9 +92,9 @@ export async function POST(request: NextRequest) {
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const tag = formData.get("tag") as Tags;
-    const images = formData.getAll("images") as string[];
+    const imageFiles = formData.getAll("imageFiles");
 
-    if (!images.length) {
+    if (!imageFiles.length) {
       return NextResponse.json(
         { error: "At least one image is required" },
         { status: 400 }
@@ -118,14 +118,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Upload all images to Cloudinary
-    const uploadPromises = images.map((imageFile) =>
-      cloudinary.uploader.upload(imageFile, {
-        folder: "products",
-      })
-    );
+    // Convert files to base64 for Cloudinary
+    const imagePromises = imageFiles.map(async (file: File) => {
+      // Convert File object to Buffer
+      const bytes = await file.arrayBuffer();
+      const buffer = Buffer.from(bytes);
 
-    const uploadResults = await Promise.all(uploadPromises);
+      // Convert to base64 string for Cloudinary
+      const base64Image = `data:${file.type};base64,${buffer.toString(
+        "base64"
+      )}`;
+
+      // Upload to Cloudinary
+      return cloudinary.uploader.upload(base64Image, {
+        folder: "products",
+      });
+    });
+
+    const uploadResults = await Promise.all(imagePromises);
     const imageUrls = uploadResults.map((result) => result.secure_url);
 
     // Create product with the first image as primary
@@ -137,7 +147,8 @@ export async function POST(request: NextRequest) {
         image: imageUrls[0], // Set first image as primary
         vendorId: vendor.id,
         images: {
-          create: imageUrls.slice(1).map((url) => ({
+          create: imageUrls.map((url, index) => ({
+            // Create entries for all images including the primary one
             url,
           })),
         },
@@ -154,7 +165,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
-    console.error("Error creating product:", JSON.stringify(error));
+    console.error("Error creating product:", error);
     return NextResponse.json(
       { error: "Failed to create product" },
       { status: 500 }
