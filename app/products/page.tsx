@@ -31,7 +31,6 @@ function ProductsPageContent() {
   const [selectedMarket, setSelectedMarket] = useState<string>("all");
 
   const { data: marketsData } = useMarkets();
-  console.log("Markets data:", marketsData);
   const markets = marketsData || [];
 
   const { data } = useProductSearch(
@@ -77,9 +76,9 @@ function ProductsPageContent() {
       {/* Header */}
       <header className="top-0 z-50 sticky bg-background/80 backdrop-blur-sm border-b w-full">
         <div className="mx-auto px-4 container">
-          <div className="flex justify-between items-center md:gap-4 h-16">
-            <div className="flex flex-1 items-center gap-4">
-              <div className="flex-1 max-w-[200px]">
+          <div className="flex sm:flex-row flex-col sm:items-center gap-3 sm:gap-4 py-3 sm:py-0 sm:h-16">
+            <div className="flex sm:flex-row flex-col sm:items-center gap-3 sm:gap-4 w-full">
+              <div className="sm:flex-shrink-0 w-full sm:w-[180px]">
                 <Select
                   value={selectedMarket}
                   onValueChange={setSelectedMarket}
@@ -97,9 +96,14 @@ function ProductsPageContent() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex-1">
+              <div className="sm:flex-grow w-full">
                 <Suspense fallback={<LoadingScreen />}>
-                  <ProductSearch onProductSelect={handleProductSelect} />
+                  <ProductSearch
+                    onProductSelect={handleProductSelect}
+                    marketId={
+                      selectedMarket === "all" ? undefined : selectedMarket
+                    }
+                  />
                 </Suspense>
               </div>
             </div>

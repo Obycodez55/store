@@ -14,16 +14,18 @@ import { ProductGrid } from "./ProductGrid";
 interface ProductSearchProps {
   onProductSelect: (product: Product) => void;
   className?: string;
+  marketId?: string; // Add this prop
 }
 
 export const ProductSearch = ({
   onProductSelect,
   className,
+  marketId, // Add this prop
 }: ProductSearchProps) => {
   const [query, setQuery] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const { data, isLoading } = useProductSearch(query);
+  const { data, isLoading } = useProductSearch(query, undefined, marketId);
   const searchRef = useRef<HTMLDivElement>(null);
 
   useOnClickOutside(searchRef as React.RefObject<HTMLElement>, () =>
@@ -52,7 +54,7 @@ export const ProductSearch = ({
 
   return (
     <div ref={searchRef} className={`relative w-full ${className}`}>
-      <div className="relative">
+      <div className="relative w-full">
         <Input
           value={inputValue}
           placeholder="Search products..."
