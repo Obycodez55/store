@@ -31,6 +31,9 @@ export async function GET(
           },
         },
       },
+      include: {
+        images: true,
+      },
     });
 
     if (!product) {
@@ -74,56 +77,71 @@ export async function PUT(request: NextRequest, { params }: any) {
       return new NextResponse("Product not found", { status: 404 });
     }
 
-    // Handle multiple images
-    const images = formData.getAll("images") as string[];
-    let primaryImage = existingProduct.image;
-    const imageUrls: string[] = [];
+    // Parse existing images to keep from the form data
+    const existingImages = JSON.parse(
+      (formData.get("existingImages") as string) || "[]"
+    );
 
-    // Upload all images to Cloudinary
-    if (images.length > 0) {
-      const uploadPromises = images.map((imageFile) =>
-        cloudinary.uploader.upload(imageFile, {
+    // Upload new images to Cloudinary if provided
+    const imageFiles = formData.getAll("imageFiles") as File[];
+    const newImageUrls: string[] = [];
+
+    if (imageFiles.length > 0) {
+      const imagePromises = imageFiles.map(async (file: File) => {
+        const bytes = await file.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const base64Image = `data:${file.type};base64,${buffer.toString(
+          "base64"
+        )}`;
+        return cloudinary.uploader.upload(base64Image, {
           folder: "products",
-        })
-      );
+        });
+      });
 
-      const uploadResults = await Promise.all(uploadPromises);
+      const uploadResults = await Promise.all(imagePromises);
+      newImageUrls.push(...uploadResults.map((result) => result.secure_url));
+    }
 
-      // Set first image as primary if it exists
-      if (uploadResults[0]) {
-        primaryImage = uploadResults[0].secure_url;
+    // Determine primary image - first existing image or first new image if no existing
+    const primaryImage =
+      existingImages.length > 0
+        ? existingImages[0]
+        : newImageUrls.length > 0
+        ? newImageUrls[0]
+        : existingProduct.image;
+
+    // Get all current image URLs from the database
+    const currentImageUrls = [
+      existingProduct.image,
+      ...existingProduct.images.map((img) => img.url),
+    ].filter(Boolean);
+
+    // Find images to delete - images that were in the database but not in the existingImages list
+    const imagesToDelete = currentImageUrls.filter(
+      (url) => !existingImages.includes(url)
+    );
+
+    // Delete removed images from Cloudinary
+    for (const url of imagesToDelete) {
+      try {
+        const publicId = url?.split("/").pop()?.split(".")[0];
+        if (publicId) {
+          await cloudinary.uploader.destroy(`products/${publicId}`);
+        }
+      } catch (error) {
+        console.error("Failed to delete old image from Cloudinary:", error);
       }
-
-      // Store remaining images
-      imageUrls.push(
-        ...uploadResults.slice(1).map((result) => result.secure_url)
-      );
     }
 
     // Get tag from form data
     const tag = formData.get("tag");
     const tags = tag ? [tag as Tags] : existingProduct.tags;
 
-    // Delete old images from Cloudinary if new images are uploaded
-    if (images.length > 0) {
-      const oldImageUrls = [
-        existingProduct.image,
-        ...existingProduct.images.map((img) => img.url),
-      ].filter(Boolean);
+    // Calculate final image URLs (excluding duplicates)
+    const allFinalImages = [...existingImages, ...newImageUrls];
+    const uniqueImages = [...new Set(allFinalImages)];
 
-      for (const url of oldImageUrls) {
-        try {
-          const publicId = url?.split("/").pop()?.split(".")[0];
-          if (publicId) {
-            await cloudinary.uploader.destroy(`products/${publicId}`);
-          }
-        } catch (error) {
-          console.error("Failed to delete old image from Cloudinary:", error);
-        }
-      }
-    }
-
-    // Update product with new images
+    // Update product
     const product = await prisma.product.update({
       where: { id: params.productId },
       data: {
@@ -131,15 +149,12 @@ export async function PUT(request: NextRequest, { params }: any) {
         description: formData.get("description") as string,
         image: primaryImage,
         tags: tags,
-        images:
-          images.length > 0
-            ? {
-                deleteMany: {}, // Delete all existing images
-                create: imageUrls.map((url) => ({
-                  url,
-                })),
-              }
-            : undefined,
+        images: {
+          deleteMany: {}, // Delete all existing image records
+          create: uniqueImages
+            .filter((url) => url !== primaryImage) // Exclude primary image to avoid duplication
+            .map((url) => ({ url })),
+        },
       },
       include: {
         images: true,
