@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error creating product:", error);
     return NextResponse.json(
-      { error: "Failed to create product" },
+      { error: "Failed to create product", cause: JSON.stringify(error) },
       { status: 500 }
     );
   }
