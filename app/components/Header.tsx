@@ -7,10 +7,12 @@ import { useRouter } from "next/navigation";
 import { Market } from "@/types/market";
 import { UserMenu } from "./UserMenu";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function Header({ markets = [] }: { markets: Market[] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
+  const { data: session } = useSession();
 
   const handleMarketSelect = (market: Market) => {
     router.push(`/markets/${market.id}`);
@@ -20,7 +22,7 @@ export default function Header({ markets = [] }: { markets: Market[] }) {
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="top-0 z-50 sticky bg-card shadow-sm border-b border-border w-full"
+      className="relative top-0 z-50 sticky bg-card shadow-sm border-b border-border w-full"
     >
       {/* Desktop Navigation */}
       <div className="md:flex justify-between items-center hidden mx-auto px-6 py-4 w-full max-w-7xl">
@@ -51,9 +53,12 @@ export default function Header({ markets = [] }: { markets: Market[] }) {
           <Link href="/products" className="btn-secondary">
             Browse Products
           </Link>
-          <Link href="/dashboard" className="btn-secondary">
-            Dashboard
-          </Link>
+
+          {session && (
+            <Link href="/dashboard" className="btn-secondary">
+              Dashboard
+            </Link>
+          )}
         </motion.div>
 
         <UserMenu />
@@ -108,12 +113,14 @@ export default function Header({ markets = [] }: { markets: Market[] }) {
                 >
                   Browse Products
                 </Link>
-                <Link
-                  href="/dashboard"
-                  className="justify-center w-full btn-secondary"
-                >
-                  Dashboard
-                </Link>
+                {session && (
+                  <Link
+                    href="/dashboard"
+                    className="justify-center w-full btn-secondary"
+                  >
+                    Dashboard
+                  </Link>
+                )}
               </motion.div>
               <div className="w-full">
                 <UserMenu />

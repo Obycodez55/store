@@ -30,14 +30,9 @@ interface ProductGridProps {
 
 export function ProductGrid({
   products = [],
-  isLoading,
-  isManageable,
-  onDelete,
   onProductSelect,
   variant = "default",
 }: ProductGridProps) {
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
   const gridClass =
     variant === "search"
       ? "gap-3 grid grid-cols-1 sm:grid-cols-2 auto-rows-[minmax(0,15rem)]"
@@ -63,22 +58,29 @@ export function ProductGrid({
                 <img
                   src={product.image}
                   alt={product.name}
+                  loading="lazy"
                   className="aspect-2 object-cover"
                 />
               )
             )}
+
+            {variant === "search" && (
+              <div className="right-0 bottom-0 left-0 absolute bg-black bg-opacity-60 p-2 text-white">
+                <h3 className="font-medium text-sm truncate">{product.name}</h3>
+              </div>
+            )}
           </div>
-          <div className="p-4">
-            <h3 className="font-medium truncate">{product.name}</h3>
-            <div className="flex justify-between items-center mt-2">
-              <p className="text-muted-foreground text-sm truncate">
-                {product.vendor.name}
-              </p>
-              {product.price && (
-                <p className="font-semibold">{formatPrice(product.price)}</p>
-              )}
+
+          {variant !== "search" && (
+            <div className="p-4">
+              <h3 className="font-medium truncate">{product.name}</h3>
+              <div className="flex justify-between items-center mt-2">
+                <p className="text-muted-foreground text-sm truncate">
+                  {product.vendor.name}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </Card>
       ))}
     </div>

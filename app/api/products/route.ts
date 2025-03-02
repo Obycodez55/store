@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { Tags } from "@prisma/client";
+import { Prisma, Tags } from "@prisma/client";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -13,11 +13,6 @@ cloudinary.config({
 
 export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
     const { searchParams } = new URL(req.url);
     const marketId = searchParams.get("marketId");
     const page = parseInt(searchParams.get("page") || "1");
@@ -37,8 +32,13 @@ export async function GET(req: Request) {
       ...(query
         ? {
             OR: [
-              { name: { contains: query, mode: "insensitive" } },
-              { description: { contains: query, mode: "insensitive" } },
+              { name: { contains: query, mode: Prisma.QueryMode.insensitive } },
+              {
+                description: {
+                  contains: query,
+                  mode: Prisma.QueryMode.insensitive,
+                },
+              },
             ],
           }
         : {}),
@@ -74,7 +74,7 @@ export async function GET(req: Request) {
       },
     });
   } catch (error) {
-    console.error("Error fetching products:", error);
+    console.error("Error fetching products:", JSON.stringify(error));
     return new NextResponse("Internal error", { status: 500 });
   }
 }

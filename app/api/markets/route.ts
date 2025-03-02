@@ -16,7 +16,7 @@ export async function GET() {
 
     return NextResponse.json(markets);
   } catch (error) {
-    console.error("Error fetching markets:", error);
+    console.error("Error fetching markets:", JSON.stringify(error));
     return new NextResponse("Internal error", { status: 500 });
   }
 }
