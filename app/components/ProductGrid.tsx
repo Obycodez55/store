@@ -58,6 +58,7 @@ export function ProductGrid({
                 <img
                   src={product.image}
                   alt={product.name}
+                  loading="lazy"
                   className="aspect-2 object-cover"
                 />
               )
