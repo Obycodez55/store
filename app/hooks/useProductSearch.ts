@@ -12,32 +12,22 @@ interface SearchResponse {
 }
 
 export function useProductSearch(
-  searchQuery?: string,
+  query: string,
   page?: number,
   marketId?: string
 ) {
-  const queryKey = ["products", searchQuery, page, marketId];
-
   return useQuery({
-    queryKey,
+    queryKey: ["products", query, page, marketId],
     queryFn: async () => {
       const searchParams = new URLSearchParams();
-      if (searchQuery) searchParams.set("q", searchQuery);
+      if (query) searchParams.set("q", query);
       if (page) searchParams.set("page", String(page));
       if (marketId) searchParams.set("marketId", marketId);
 
       const response = await fetch(`/api/products?${searchParams.toString()}`);
-      if (!response.ok) throw new Error("Failed to fetch products");
-
-      const products = await response.json();
-      return products;
+      if (!response.ok) throw new Error("Network response was not ok");
+      return response.json();
     },
-    select: (data) => ({
-      ...data,
-      products: data.products.map((product: any) => ({
-        ...product,
-        images: product.images || [], // Ensure images is always an array
-      })),
-    }),
+    enabled: query !== undefined,
   });
 }

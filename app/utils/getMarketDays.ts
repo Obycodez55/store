@@ -17,8 +17,8 @@ export function getMarketDays(prevDate: string, inputInterval: string) {
   // Calculate the interval in days
   //   const interval = next.diff(prev, "days");
   // interval is in form 3 DAY, extract 3
-  const interval = parseInt(inputInterval.split(" ")[0]);
-
+  let interval = parseInt(inputInterval.split(" ")[0]);
+  interval -= 1;
   // Get today's date (ignoring time)
   const today = moment().startOf("day");
 
@@ -28,10 +28,14 @@ export function getMarketDays(prevDate: string, inputInterval: string) {
   const daysDiff = today.diff(prev, "days");
   const intervalsCount = Math.floor(daysDiff / interval);
   lastMarketDay.add(intervalsCount * interval, "days");
-  lastMarketDay.subtract(interval, "days"); // Step back one interval
+  // lastMarketDay.subtract(interval, "days"); // Step back one interval
 
   // Find the next market day after today
-  const nextMarketDay = lastMarketDay.clone().add(interval - 1, "days");
+  const nextMarketDay = lastMarketDay.clone().add(interval, "days");
+  console.log("prev", prev.format("YYYY-MM-DD"));
+  console.log("interval", interval);
+  console.log("lastMarketDay", lastMarketDay.format("YYYY-MM-DD"));
+  console.log("nextMarketDay", nextMarketDay.format("YYYY-MM-DD"));
 
   return {
     interval,

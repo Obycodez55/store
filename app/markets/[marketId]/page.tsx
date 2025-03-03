@@ -118,22 +118,7 @@ const Market = () => {
       };
     }
 
-    // Use current date if the dates are invalid (1970)
-
     const prevDate = market.prevDate && new Date(market.prevDate);
-
-    // if (useCurrentDate) {
-    //   const today = new Date();
-    //   return {
-    //     interval: 7, // default to weekly
-    //     lastMarketDay: today,
-    //     nextMarketDay: new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000),
-    //     formattedLastMarketDay: moment(today).format("MMMM DD, YYYY"),
-    //     formattedNextMarketDay: moment(today)
-    //       .add(7, "days")
-    //       .format("MMMM DD, YYYY"),
-    //   };
-    // }
 
     const { lastMarketDay, nextMarketDay, interval } = getMarketDays(
       moment(prevDate).format("YYYY-MM-DD"),
@@ -148,7 +133,8 @@ const Market = () => {
       formattedNextMarketDay: moment(nextMarketDay).format("MMMM DD, YYYY"),
     };
   }, [market?.prevDate, market?.nextDate]);
-
+  const intervalDisplay =
+    marketDays && (marketDays.interval === 1 ? 1 : marketDays.interval + 1);
   const subscribeToMarketDays = useCallback(() => {
     if (!market) return;
     subscribe({
@@ -255,7 +241,7 @@ const Market = () => {
                   </span>
                   <span className="flex items-center gap-2">
                     <Calendar className="w-5 h-5" />
-                    Every {marketDays.interval} days
+                    Every {intervalDisplay} days
                   </span>
                 </div>
               </motion.div>
@@ -283,6 +269,7 @@ const Market = () => {
 
               <MarketDaysDisplay
                 interval={marketDays.interval!}
+                intervalDisplay={intervalDisplay}
                 lastMarketDay={marketDays.formattedLastMarketDay}
                 nextMarketDay={marketDays.formattedNextMarketDay}
                 onSubscribe={subscribeToMarketDays}

@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { PageTransition } from "@/app/components/PageTransition";
+import { LoadingScreen } from "@/app/components/LoadingScreen";
 import { Product, Tags } from "@prisma/client";
 import {
   Select,
@@ -19,13 +20,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export default function EditProduct({
-  params,
-}: {
-  params: { productId: string };
-}) {
+interface ImageWithType {
+  url: string;
+  isExisting: boolean;
+  file?: File;
+}
+
+export default function EditProduct({ params }: { params: any }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [images, setImages] = useState<ImageWithType[]>([]);
   const [selectedTag, setSelectedTag] = useState<Tags>(Tags.OTHER);
   const router = useRouter();
   const [product, setProduct] = useState<Product | null>(null);
@@ -37,31 +40,59 @@ export default function EditProduct({
         const data = await response.json();
         setProduct(data);
         setSelectedTag(data.tags[0] || Tags.OTHER);
-        // Initialize image previews with existing images
-        setImagePreviews(
-          [data.image, ...data.images.map((img: any) => img.url)].filter(
-            Boolean
-          )
-        );
+
+        // Set up initial images from product
+        const existingImages: ImageWithType[] = [];
+
+        // Add primary image first
+        if (data.image) {
+          existingImages.push({ url: data.image, isExisting: true });
+        }
+
+        // Then add other images, avoiding duplicates
+        if (data.images && data.images.length > 0) {
+          data.images.forEach((img: any) => {
+            // Only add if not already the primary image
+            if (img.url !== data.image) {
+              existingImages.push({ url: img.url, isExisting: true });
+            }
+          });
+        }
+
+        setImages(existingImages);
       }
     };
     fetchProduct();
   }, [params.productId]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length) return;
 
-    files.forEach((file) => {
+    const newFiles = Array.from(e.target.files);
+    const newImageObjects: ImageWithType[] = [];
+
+    // Process each new file
+    for (const file of newFiles) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviews((prev) => [...prev, reader.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
+      await new Promise<void>((resolve) => {
+        reader.onloadend = () => {
+          newImageObjects.push({
+            url: reader.result as string,
+            isExisting: false,
+            file,
+          });
+          resolve();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Add new images to the current set
+    setImages((prev) => [...prev, ...newImageObjects]);
   };
 
   const removeImage = (index: number) => {
-    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -72,9 +103,19 @@ export default function EditProduct({
       const formData = new FormData(e.currentTarget);
       formData.append("tag", selectedTag);
 
-      // Clear existing images and add all current previews
-      imagePreviews.forEach((preview) => {
-        formData.append("images", preview);
+      // Add existing image URLs that weren't removed
+      const existingImageUrls = images
+        .filter((img) => img.isExisting)
+        .map((img) => img.url);
+      formData.append("existingImages", JSON.stringify(existingImageUrls));
+
+      // Add only new image files
+      const newImageFiles = images
+        .filter((img) => !img.isExisting && img.file)
+        .map((img) => img.file!);
+
+      newImageFiles.forEach((file) => {
+        formData.append("imageFiles", file);
       });
 
       const response = await fetch(`/api/products/${params.productId}`, {
@@ -218,12 +259,12 @@ export default function EditProduct({
                 </div>
 
                 {/* Image Previews */}
-                {imagePreviews.length > 0 && (
+                {images.length > 0 && (
                   <div className="gap-2 grid grid-cols-2">
-                    {imagePreviews.map((preview, index) => (
+                    {images.map((image, index) => (
                       <div key={index} className="relative group">
                         <img
-                          src={preview}
+                          src={image.url}
                           alt={`Preview ${index + 1}`}
                           className="rounded-md w-full aspect-square object-cover"
                         />

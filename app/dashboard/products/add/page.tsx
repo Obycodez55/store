@@ -126,6 +126,33 @@ export default function AddProduct() {
           <Card className="md:col-span-2">
             <CardContent className="p-6">
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Image Previews */}
+                {imagePreviews.length > 0 && (
+                  <div className="gap-2 grid grid-cols-2">
+                    {imagePreviews.map((preview, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={preview}
+                          alt={`Preview ${index + 1}`}
+                          className="rounded-md w-full aspect-square object-cover"
+                        />
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          className="top-2 right-2 absolute opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => removeImage(index)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                        {index === 0 && (
+                          <span className="bottom-2 left-2 absolute bg-black/50 px-2 py-1 rounded text-white text-xs">
+                            Primary
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {/* Product Details */}
                 <div className="space-y-4">
                   <div>
@@ -195,33 +222,6 @@ export default function AddProduct() {
             </CardContent>
           </Card>
 
-          {/* Image Previews */}
-          {imagePreviews.length > 0 && (
-            <div className="gap-2 grid grid-cols-2">
-              {imagePreviews.map((preview, index) => (
-                <div key={index} className="relative group">
-                  <img
-                    src={preview}
-                    alt={`Preview ${index + 1}`}
-                    className="rounded-md w-full aspect-square object-cover"
-                  />
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="top-2 right-2 absolute opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => removeImage(index)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                  {index === 0 && (
-                    <span className="bottom-2 left-2 absolute bg-black/50 px-2 py-1 rounded text-white text-xs">
-                      Primary
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
           {/* Image Upload Card */}
           <Card>
             <CardContent className="p-6">
